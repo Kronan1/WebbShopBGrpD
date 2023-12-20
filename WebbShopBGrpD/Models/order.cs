@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace WebbShopBGrpD.Models
 {
-    internal class order
+    internal class Order
     {
+        public int id { get; set; }
+        public int DeliveryOptionId { get; set; }
+        public int PaymentOptionId { get; set; }
+        public int CustomerId { get; set; }
+        public int PurchasedArticlesId { get; set; }
     }
 }
