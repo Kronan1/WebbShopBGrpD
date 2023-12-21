@@ -8,6 +8,10 @@ namespace WebbShopBGrpD.Models
 {
     internal class Customer
     {
+        public Customer()
+        {
+            Orders = new HashSet<Order>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public string StreetAdress { get; set; }
@@ -19,6 +23,6 @@ namespace WebbShopBGrpD.Models
         public int Age { get; set; }
         public string Password { get; set; }
 
-
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

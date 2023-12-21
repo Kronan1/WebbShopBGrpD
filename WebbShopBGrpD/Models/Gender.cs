@@ -8,7 +8,13 @@ namespace WebbShopBGrpD.Models
 {
     internal class Gender
     {
+        public Gender()
+        {
+            Products = new HashSet<Product>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public virtual ICollection<Product> Products { get; set;}
     }
 }

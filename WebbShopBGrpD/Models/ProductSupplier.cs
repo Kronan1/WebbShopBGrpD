@@ -8,6 +8,10 @@ namespace WebbShopBGrpD.Models
 {
     internal class ProductSupplier
     {
+        public ProductSupplier()
+        {
+            Products = new HashSet<Product>();
+        }
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -17,5 +21,7 @@ namespace WebbShopBGrpD.Models
         public string City { get; set; }
 
         public string Country{ get; set; }
+
+        public virtual ICollection<Product> Products { get; set; }
     }
 }
