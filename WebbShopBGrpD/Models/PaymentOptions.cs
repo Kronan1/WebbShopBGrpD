@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebbShopBGrpD.Models
 {
-    internal class PaymentOptions
+    internal class PaymentOptions // Enum istället
     {
         public int Id { get; set; }
         public string Name { get; set; }

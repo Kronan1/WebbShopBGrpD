@@ -8,7 +8,7 @@ namespace WebbShopBGrpD.Models
 {
     internal class Gender
     {
-        public Gender()
+        public Gender() // enum till product
         {
             Products = new HashSet<Product>();
         }

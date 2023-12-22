@@ -8,7 +8,7 @@ namespace WebbShopBGrpD.Models
 {
     internal class FeaturedProducts
     {
-        public FeaturedProducts()
+        public FeaturedProducts() // Bit i product
         {
             Products = new HashSet<Product>();
         }

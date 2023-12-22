@@ -9,7 +9,7 @@ namespace WebbShopBGrpD.Models
 {
     internal class Sale
     {
-        public Sale()
+        public Sale() // Bit i products?
         {
             Products = new HashSet<Product>();
         }
