@@ -14,7 +14,6 @@ namespace WebbShopBGrpD.Models
             Products = new HashSet<Product>();
         }
         public int Id { get; set; }
-        public int ProductId { get; set; }
 
         public virtual ICollection<Product> Products { get; set; }
     }

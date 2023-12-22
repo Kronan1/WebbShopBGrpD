@@ -11,7 +11,7 @@ namespace WebbShopBGrpD.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public virtual Order? Order { get; set; }
+        public virtual Order? Order { get; set; } // En till många?
         
     }
 }
