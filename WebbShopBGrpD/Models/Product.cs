@@ -11,19 +11,18 @@ namespace WebbShopBGrpD.Models
         public Product()
         {
             PurchasedArticles = new HashSet<PurchasedArticles>();
-            Sales = new HashSet<Sale>(); 
         }
         public int Id { get; set; }
         public string Name { get; set; }
         public float Price { get; set; }
         public string Info { get; set; }
         public int Quantity { get; set; }
+        public bool Sale { get; set; }
+        public bool FeaturedProduct { get; set; }
+        public int Gender { get; set; }
+        public int ProductCategory { get; set; }
 
-        public virtual FeaturedProducts? FeaturedProducts { get; set; }
-        public virtual ProductCategory ProductCategory { get; set; }
-        public virtual Gender Gender { get; set; }
         public virtual ProductSupplier Supplier { get; set; }
-        public virtual ICollection<Sale> Sales { get; set; }
         public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
     }
 }

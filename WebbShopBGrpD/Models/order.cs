@@ -11,14 +11,12 @@ namespace WebbShopBGrpD.Models
         public Order()
         {
             PurchasedArticles = new HashSet<PurchasedArticles>();
-            PaymentOptions = new HashSet<PaymentOptions>();
-            DeliveryOptions = new HashSet<DeliveryOptions>();
         }
         public int Id { get; set; }
+        public bool PaymentOption { get; set; }
+        public bool DeliveryOption { get; set; }
 
         public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
-        public virtual ICollection<PaymentOptions> PaymentOptions { get; set; } // En till en?
-        public virtual ICollection<DeliveryOptions> DeliveryOptions { get; set; } // En till en?
         public virtual Customer Customer { get; set; }
     }
 }
