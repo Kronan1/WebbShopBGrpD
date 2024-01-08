@@ -33,6 +33,12 @@ namespace WebbShopBGrpD
             Unisex
         }
 
+        public enum ProductCategory
+        {
+            Tröjor,
+            Byxor,
+            Skor
+        }
 
     }
 }
