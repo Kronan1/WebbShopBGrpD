@@ -148,6 +148,8 @@ namespace WebbShopBGrpD
                         ShopPage();
                         break;
                     case ConsoleKey.E:
+                        Console.Clear();
+                        ShoppingCartPage();
                         break;
                     case ConsoleKey.R:
                         break;
@@ -183,19 +185,45 @@ namespace WebbShopBGrpD
 
             }
 
-                //int quantity = 0;
-                //for (int i = 0; i < productsInCart; i++)
-                //{
-                //    foreach (var product in ShoppingCart)
-                //    {
-                //        if (product.Id == ShoppingCart[i].Id)
-                //        {
-                //            quantity++;
-                //        }
-                //    }
+            List<Product> shoppingCartFilter = ShoppingCart.Distinct().ToList();
+            Dictionary<Product, int> productDictionary = shoppingCartFilter.ToDictionary(x => x, value => 0);
 
-                //}
+            foreach (Product product in shoppingCartFilter)
+            {
+                
+                foreach (var product2 in ShoppingCart)
+                {
+                    if (product2.Id == product.Id)
+                    {
+                        productDictionary[product] += 1;
+                    }
+                }
             }
+
+            List<string> shoppingCartText = new List<string>();
+
+            foreach (var product in ShoppingCart)
+            {
+                shoppingCartText.Add(product.Name);
+            }
+
+            var shoppingCartWindow = new Window("Varukorg", 15, 10, shoppingCartText);
+            shoppingCartWindow.Left = 45;
+            shoppingCartWindow.Draw();
+
+            //int quantity = 0;
+            //for (int i = 0; i < productsInCart; i++)
+            //{
+            //    foreach (var product in ShoppingCart)
+            //    {
+            //        if (product.Id == ShoppingCart[i].Id)
+            //        {
+            //            quantity++;
+            //        }
+            //    }
+
+            //}
+        }
 
         public void showProductCategories(int category)
         {
