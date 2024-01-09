@@ -183,7 +183,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 0,
+                    ProductCategory = 1,
                     Supplier = currentSuppliers[3]
                 },
                 new Product
@@ -195,7 +195,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 1,
-                    ProductCategory = 1,
+                    ProductCategory = 0,
                     Supplier = currentSuppliers[4]
                 },
                 new Product
@@ -219,19 +219,19 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 0,
+                    ProductCategory = 1,
                     Supplier = currentSuppliers[6]
                 },
                 new Product
                 {
-                    Name = "Bomberjacka",
+                    Name = "Luvtröja",
                     Price = 400,
-                    Info = "100% Läder",
+                    Info = "100% Bomull",
                     Quantity = 15,
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 1,
-                    ProductCategory = 1,
+                    ProductCategory = 0,
                     Supplier = currentSuppliers[7]
                 },
                 new Product
@@ -283,6 +283,8 @@ namespace WebbShopBGrpD
                         Password = "password"
                     }
                 );
+
+                myDb.SaveChanges();
             }
         }
 
