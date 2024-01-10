@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -176,54 +177,162 @@ namespace WebbShopBGrpD
         public void ShoppingCartPage()
         {
 
-            ConsoleKeyInfo input = Console.ReadKey(true);
+            bool process = true;
 
-            switch (input.Key)
+            while (process)
             {
-                case ConsoleKey.X:
-                    break;
+                Console.Clear();
+                List<Product> shoppingCartFilter = ShoppingCart.Distinct().ToList();
+                Dictionary<Product, int> productDictionary = shoppingCartFilter.ToDictionary(x => x, value => 0);
 
-            }
 
-            List<Product> shoppingCartFilter = ShoppingCart.Distinct().ToList();
-            Dictionary<Product, int> productDictionary = shoppingCartFilter.ToDictionary(x => x, value => 0);
-
-            foreach (Product product in shoppingCartFilter)
-            {
                 
-                foreach (var product2 in ShoppingCart)
+                foreach (Product product in shoppingCartFilter)
                 {
-                    if (product2.Id == product.Id)
+                    foreach (var product2 in ShoppingCart)
                     {
-                        productDictionary[product] += 1;
+                        if (product2.Id == product.Id)
+                        {
+                            productDictionary[product] += 1;
+                            
+                        }
+                    }
+                }
+
+                List<string> shoppingCartText = new List<string>();
+
+                double totalSum = 0;
+                int iterator = 1;
+                foreach (var product in productDictionary)
+                {
+                    shoppingCartText.Add($" [{iterator}] " + product.Key.Name + " Antal " + product.Value.ToString() + " : " + (shoppingCartFilter[iterator - 1].Price * product.Value) + " kr") ;
+                    totalSum += (shoppingCartFilter[iterator - 1].Price * product.Value);
+                    iterator++;   
+                }
+
+                shoppingCartText.Add(" Totalsumma : " + totalSum + " kr");
+                shoppingCartText.Add("");
+                shoppingCartText.Add(" [X] för att backa");
+                shoppingCartText.Add(" [Y] för att ändra produkt");
+                shoppingCartText.Add(" [K] för att gå till kassan");
+
+                var shoppingCartWindow = new Window("Varukorg", 15, 10, shoppingCartText);
+                shoppingCartWindow.Left = 45;
+                shoppingCartWindow.Draw();
+
+                ConsoleKeyInfo input = Console.ReadKey(true);
+
+                if (input.Key == ConsoleKey.X)
+                {
+                    process = false;
+                    Console.Clear();
+                    ShopPage();
+                }
+                else if (input.Key == ConsoleKey.Y)
+                {
+                    List<string> instructionsText = new();
+                    instructionsText.Add(" Välj artikel genom att ange artikelnummer");
+
+                    var instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
+                    instructionsWindow.Left = 45;
+                    instructionsWindow.Draw();
+
+                    
+
+                    if (int.TryParse(Console.ReadLine(), out int input2))
+                    {
+                        if (productDictionary.Count >= input2 && input2 >= 1)
+                        {
+                            Console.Clear();
+                            bool processProduct = true;
+                            while (processProduct)
+                            {
+
+                                var currentProduct = shoppingCartFilter[input2 - 1];
+                                
+
+                                int currentProductAmount = 0;
+                                foreach (var product2 in ShoppingCart)
+                                {
+                                    if (product2 == currentProduct)
+                                    {
+                                        currentProductAmount++;
+                                    }
+                                }
+
+                                List<string> currentProductList = new();
+                                currentProductList.Add(" " + currentProduct.Name);
+                                currentProductList.Add( " Antal : " + currentProductAmount.ToString());
+                                currentProductList.Add(" ");
+                                currentProductList.Add(" [A] för att minska antal");
+                                currentProductList.Add(" [D] för att öka antal");
+                                currentProductList.Add(" [X] för att bekräfta");
+
+
+                                var currentProductWindow = new Window("", 15, 15, currentProductList);
+                                currentProductWindow.Left = 45;
+                                currentProductWindow.Draw();
+                                input = Console.ReadKey(true);
+
+                                
+                                switch (input.Key)
+                                {
+                                    case ConsoleKey.A:
+                                        if (ShoppingCart.Contains(currentProduct))
+                                        {
+                                            ShoppingCart.Remove(currentProduct);
+                                        }
+                                        break;
+                                    case ConsoleKey.D:
+                                        if (ShoppingCart.Contains(currentProduct) && currentProduct.Quantity > currentProductAmount)
+                                        {
+                                            ShoppingCart.Add(currentProduct);
+                                        }
+                                        break;
+                                    case ConsoleKey.X:
+                                        processProduct = false;
+                                        break;
+                                }
+                            }
+                            
+                        }
+                        else
+                        {
+                            instructionsText.Add(" Finns ingen artikel med det numret");
+
+                            instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
+                            instructionsWindow.Left = 45;
+                            instructionsWindow.Draw();
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    else
+                    {
+                        instructionsText.Add(" Felaktig inmatning");
+
+                        instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
+                        instructionsWindow.Left = 45;
+                        instructionsWindow.Draw();
+                        Thread.Sleep(1000);
                     }
                 }
             }
-
-            List<string> shoppingCartText = new List<string>();
-
-            foreach (var product in ShoppingCart)
-            {
-                shoppingCartText.Add(product.Name);
-            }
-
-            var shoppingCartWindow = new Window("Varukorg", 15, 10, shoppingCartText);
-            shoppingCartWindow.Left = 45;
-            shoppingCartWindow.Draw();
-
-            //int quantity = 0;
-            //for (int i = 0; i < productsInCart; i++)
-            //{
-            //    foreach (var product in ShoppingCart)
-            //    {
-            //        if (product.Id == ShoppingCart[i].Id)
-            //        {
-            //            quantity++;
-            //        }
-            //    }
-
-            //}
         }
+
+
+        //int quantity = 0;
+        //for (int i = 0; i < productsInCart; i++)
+        //{
+        //    foreach (var product in ShoppingCart)
+        //    {
+        //        if (product.Id == ShoppingCart[i].Id)
+        //        {
+        //            quantity++;
+        //        }
+        //    }
+
+        //}
+
 
         public void showProductCategories(int category)
         {
@@ -308,10 +417,10 @@ namespace WebbShopBGrpD
 
             bool process = true;
 
-            while (process) 
+            while (process)
             {
                 ConsoleKeyInfo input = Console.ReadKey(true);
-               
+
                 switch (input.Key)
                 {
                     case ConsoleKey.X:
