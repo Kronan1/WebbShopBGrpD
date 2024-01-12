@@ -34,6 +34,11 @@ namespace WebbShopBGrpD
 
             Console.ReadLine();
 
+
+            // Ändra kategorier till en tabell istället för enum
+            // Fixa admin
+            // Fixa produkter i varukorg
+            // Fixa Beställningar
         }
     }
 }
