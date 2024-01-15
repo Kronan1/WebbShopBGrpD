@@ -29,7 +29,7 @@ namespace WebbShopBGrpD
             menu.ShoppingCart.Add(products[0]);
 
 
-            menu.ShopPage();
+            menu.StartPage();
             
 
             Console.ReadLine();

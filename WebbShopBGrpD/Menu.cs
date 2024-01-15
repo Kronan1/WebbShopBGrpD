@@ -140,6 +140,9 @@ namespace WebbShopBGrpD
                             ShoppingCartPage();
                             break;
                         case ConsoleKey.R:
+                            Console.Clear();
+                            Admin admin = new Admin();
+                            admin.AdminPage();
                             break;
 
                         case ConsoleKey.A:
