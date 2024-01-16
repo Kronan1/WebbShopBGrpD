@@ -20,8 +20,8 @@ namespace WebbShopBGrpD.Models
         public bool Sale { get; set; }
         public bool FeaturedProduct { get; set; }
         public int Gender { get; set; }
-        public int ProductCategory { get; set; }
 
+        public virtual ProductCategory Category { get; set; }
         public virtual ProductSupplier Supplier { get; set; }
         public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
     }

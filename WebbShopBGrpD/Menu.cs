@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WebbShopBGrpD.Models;
@@ -15,7 +18,6 @@ namespace WebbShopBGrpD
         public List<Product> ShoppingCart { get; set; }
         public List<string> ShoppingCartText { get; set; }
         public double TotalSum { get; set; }
-        public MyEnums.DeliveryOption DeliveryOption { get; set; }
         public Dictionary<Product, int> AmountPerProduct { get; set; }
 
         public Menu()
@@ -23,7 +25,6 @@ namespace WebbShopBGrpD
             ShoppingCart = new List<Product>();
             ShoppingCartText = new List<string>();
             TotalSum = 0;
-            DeliveryOption = new MyEnums.DeliveryOption();
             AmountPerProduct = new Dictionary<Product, int>();
         }
         public void MenuBar()
@@ -219,17 +220,17 @@ namespace WebbShopBGrpD
                         break;
 
                     case ConsoleKey.T:
-                        showProductCategories(0);
+                        ShowProductCategories(1);
                         break;
                     case ConsoleKey.B:
-                        showProductCategories(1);
+                        ShowProductCategories(2);
                         break;
                     case ConsoleKey.S:
-                        showProductCategories(2);
+                        ShowProductCategories(3);
                         break;
                     case ConsoleKey.Z:
                         Console.Clear();
-                        showSearchProduts();
+                        ShowSearchProduts();
                         break;
                 }
             }
@@ -402,7 +403,8 @@ namespace WebbShopBGrpD
                 }
                 else if (input.Key == ConsoleKey.K)
                 {
-                    DeliveryMenu();
+                    Purchase();
+                    Console.Clear();
                 }
             }
         }
@@ -422,7 +424,7 @@ namespace WebbShopBGrpD
         //}
 
 
-        public void showProductCategories(int category)
+        public void ShowProductCategories(int category)
         {
             List<Product> products;
 
@@ -430,7 +432,8 @@ namespace WebbShopBGrpD
 
             using (var myDb = new MyDbContext())
             {
-                products = myDb.Products.Where(x => x.ProductCategory == category).ToList();
+                products = myDb.Products.Where(x => x.Category.Id == category).ToList();
+                //products = myDb.ProductCategories.Where(x => x.pr == category).ToList();
             }
 
             List<string> productNameList = new List<string>();
@@ -439,12 +442,8 @@ namespace WebbShopBGrpD
             int iterator = 1;
             foreach (var product in products)
             {
-                if (product.ProductCategory == category)
-                {
                     productNameList.Add($" [{iterator.ToString()}] " + product.Name + " " + product.Price.ToString() + " kr");
                     iterator++;
-                }
-
             }
             productNameList.Add(" [X] för att backa");
 
@@ -457,19 +456,19 @@ namespace WebbShopBGrpD
             switch (input.Key)
             {
                 case ConsoleKey.D1:
-                    showProductInfo(products[0]);
+                    ShowProductInfo(products[0]);
                     break;
                 case ConsoleKey.D2:
-                    showProductInfo(products[1]);
+                    ShowProductInfo(products[1]);
                     break;
                 case ConsoleKey.D3:
-                    showProductInfo(products[2]);
+                    ShowProductInfo(products[2]);
                     break;
                 case ConsoleKey.D4:
-                    showProductInfo(products[3]);
+                    ShowProductInfo(products[3]);
                     break;
                 case ConsoleKey.D5:
-                    showProductInfo(products[4]);
+                    ShowProductInfo(products[4]);
                     break;
                 case ConsoleKey.X:
                     Console.Clear();
@@ -478,7 +477,7 @@ namespace WebbShopBGrpD
             }
         }
 
-        public void showProductInfo(Product product)
+        public void ShowProductInfo(Product product)
         {
             Console.Clear();
 
@@ -533,33 +532,270 @@ namespace WebbShopBGrpD
             }
         }
 
-        public void DeliveryMenu()
+        public Customer ValidateCustomer()
         {
-            string name = string.Empty;
-            do
-            {
-                Console.Clear();
-                Console.Write("Namn : ");
-                name = Console.ReadLine();
-            } while (name.IsNullOrEmpty());
+            Console.Clear();
+            List<string> inputAlternatives = new List<string>();
 
-            string address = string.Empty;
-            do
+            inputAlternatives.Add(" [E] För existerande kund");
+            inputAlternatives.Add(" [A] För ny kund");
+
+            var customerOptionWindow = new Window("Leverans alternativ", 15, 10, inputAlternatives);
+            customerOptionWindow.Left = 45;
+            customerOptionWindow.Draw();
+
+            Customer customer = new();
+            while (customer.Id == 0)
             {
+                ConsoleKeyInfo input = Console.ReadKey(true);
+                switch (input.Key)
+                {
+                    case ConsoleKey.E:
+                        customer = ExistingCustomer();
+                        break;
+                    case ConsoleKey.A:
+                        customer = NewCustomer();
+                        break;
+                }
+            }
+
+            return customer;
+            
+        }
+
+        public Customer ExistingCustomer()
+        {
+            Console.WriteLine("Epost: ");
+            Customer customer = new Customer();
+            var email = Console.ReadLine();
+
+            string connectionString = "Server=.\\SQLExpress;Database=WebbShopB;Trusted_Connection=True;TrustServerCertificate=True;";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                var sql = "SELECT * FROM Customer WHERE MailAdress = @email";
+
+                customer = connection.QuerySingleOrDefault<Customer>(sql);
+            }
+
+
+            Console.Clear();
+            if (customer != null) 
+            {
+                return customer;
+            }
+            else
+            {
+                Console.WriteLine("Ingen kund med den mailadressen finns registrerad.");
+                Thread.Sleep(1000);
                 Console.Clear();
-                Console.Write("Adress : ");
-                address = Console.ReadLine();
-            } while (address.IsNullOrEmpty());
+            }
+
+            return customer;
+        }
+
+        public Customer NewCustomer()
+        {
             Console.Clear();
 
+            Console.Write("Namn: ");
+            var name = Console.ReadLine();
+            Console.Clear();
+
+            Console.Write("Adress: ");
+            var address = Console.ReadLine();
+            Console.Clear();
+
+            int zipCode = 0;
+            do
+            {
+                Console.Write("Postnummer");
+                if (!int.TryParse(Console.ReadLine(), out zipCode))
+                {
+                    Console.WriteLine(" Ett nummer mellan 10000 och 99999");
+                    Thread.Sleep(1000);
+                    Console.Clear();
+                }
+            } while (zipCode < 10000 || zipCode > 99999);
+            Console.Clear();
+
+            Console.Write("Stad: ");
+            var city = Console.ReadLine();
+            Console.Clear();
+
+            Console.Write("Land: ");
+            var country = Console.ReadLine();
+            Console.Clear();
+
+            int phoneNumber = 0;
+            do
+            {
+                Console.Write("Mobilnummer: ");
+                if (!int.TryParse(Console.ReadLine(), out phoneNumber))
+                {
+                    Console.WriteLine("Enbart siffror");
+                    Thread.Sleep(1000);
+                    Console.Clear();
+                }
+            } while (phoneNumber < 1);
+            Console.Clear();
+
+            Console.Write("Epost: ");
+            var email = Console.ReadLine();
+            Console.Clear();
+
+            int age = 0;
+            do
+            {
+                Console.Write("Ålder: ");
+                if (!int.TryParse(Console.ReadLine(), out age))
+                {
+                    Console.WriteLine("Enbart siffror");
+                    Thread.Sleep(1000);
+                    Console.Clear();
+                }
+            } while (phoneNumber < 1);
+            Console.Clear();
+
+            Console.WriteLine("Lösenord: ");
+            var password = Console.ReadLine();
+            Console.Clear();
+
+            Customer customer = new();
+            try
+            {
+                customer.Name = name;
+                customer.StreetAdress = address;
+                customer.ZIPCode = zipCode;
+                customer.City = city;
+                customer.Country = country;
+                customer.PhoneNumber = phoneNumber;
+                customer.MailAdress = email;
+                customer.Age = age;
+                customer.Password = password;
+
+                using (var myDb = new MyDbContext())
+                {
+                    myDb.Customers.Add(customer);
+
+                    myDb.SaveChanges();
+
+                    customer = myDb.Customers.OrderByDescending(c => c.Id).FirstOrDefault();
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
+
+            return customer;
+        }
+
+        public void Purchase()
+        {
+
+            var deliveryOption = DeliveryMenu();
+            var paymentOption = PaymentMenu();
+            var customer = ValidateCustomer();
+
             List<string> customerInfo = new();
-            customerInfo.Add(" Namn: " + name);
-            customerInfo.Add(" Adress: " + address);
+            customerInfo.Add(" Namn: " + customer.Name);
+            customerInfo.Add(" Adress: " + customer.StreetAdress);
+            customerInfo.Add(" Leverans: " + deliveryOption);
+            customerInfo.Add(" Betalningsmetod: " + paymentOption);
+            customerInfo.Add(" Pris: " + ((TotalSum + (int)deliveryOption) * 1.25).ToString());
+            customerInfo.Add(" ");
+            customerInfo.Add(" [K] Slutför köp");
+            customerInfo.Add(" [X] Avbryt köp");
 
             var customerWindow = new Window("Kund", 15, 5, customerInfo);
             customerWindow.Left = 45;
             customerWindow.Draw();
 
+            bool process = true;
+            while (process)
+            {
+                ConsoleKeyInfo input = Console.ReadKey(true);
+
+                switch (input.Key)
+                {
+                    case ConsoleKey.K:
+                        using (var myDb = new MyDbContext())
+                        {
+                            List<PurchasedArticles> purchasedArticlesList = new();
+                            Dictionary<Product, int> productDict = new();
+                            Order order = new Order();
+                            foreach (var product in ShoppingCart)
+                            {
+                                if (productDict.ContainsKey(product))
+                                {
+                                    productDict[product] += 1;
+                                }
+                                else
+                                {
+                                    productDict.Add(product, 1);
+                                }
+                                
+                            }
+
+                            foreach (var product in myDb.Products)
+                            {
+                                foreach (var product2 in productDict)
+                                {
+                                    if (product.Name == product2.Key.Name)
+                                    {
+                                        product.Quantity -= product2.Value;
+                                    }
+                                }
+                            }
+
+                            PurchasedArticles purchasedArticles = new();
+                            foreach (var product in productDict)
+                            {
+                                purchasedArticles.Product = product.Key;
+                                purchasedArticles.Quantity = product.Value;
+                                purchasedArticles.Order = order;
+                                purchasedArticlesList.Add(purchasedArticles);
+                            }
+
+                            
+                            order.Customer = customer;
+                            order.DeliveryOption = (int)deliveryOption;
+                            order.PaymentOption = (int)paymentOption;
+                            order.PurchasedArticles = purchasedArticlesList;
+
+                            //order.PurchasedArticles = ShoppingCart; Behöver fixa med purchasedArticles
+                            //myDb.Orders.Add();
+                        }
+                        break;
+                    case ConsoleKey.X:
+                        string connectionString = "Server=.\\SQLExpress;Database=WebbShopB;Trusted_Connection=True;TrustServerCertificate=True;";
+
+                        int customerId = customer.Id;
+                        using (var connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            var sql = "DELETE FROM Customer WHERE Id = @customerId";
+
+                            customer = connection.QuerySingleOrDefault<Customer>(sql);
+                        }
+                        process = false;
+                        break;
+                }
+            }
+
+            ShopPage();
+
+        }
+
+        public MyEnums.DeliveryOption DeliveryMenu()
+        {
+            Console.Clear();
             List<string> deliveryInfo = new();
             int iterator = 1;
             foreach (var deliveryOption in Enum.GetValues(typeof(MyEnums.DeliveryOption)))
@@ -573,7 +809,7 @@ namespace WebbShopBGrpD
             deliveryWindow.Draw();
 
             bool process = true;
-            int chosenDelivery = 0;
+            MyEnums.DeliveryOption selectedDelivery = MyEnums.DeliveryOption.Postnord;
             while (process)
             {
                 ConsoleKeyInfo input = Console.ReadKey(true);
@@ -581,79 +817,82 @@ namespace WebbShopBGrpD
                 switch (input.Key)
                 {
                     case ConsoleKey.D1:
-                        chosenDelivery = 1;
-                        DeliveryOption = MyEnums.DeliveryOption.Postnord;
+                        selectedDelivery = MyEnums.DeliveryOption.Postnord;
                         process = false;
                         break;
                     case ConsoleKey.D2:
-                        chosenDelivery = 2;
-                        DeliveryOption = MyEnums.DeliveryOption.Dhl;
+                        selectedDelivery = MyEnums.DeliveryOption.Dhl;
                         process = false;
                         break;
                     case ConsoleKey.D3:
-                        chosenDelivery = 3;
-                        DeliveryOption = MyEnums.DeliveryOption.Schenker;
+                        selectedDelivery = MyEnums.DeliveryOption.Schenker;
                         process = false;
                         break;
                     case ConsoleKey.D4:
-                        chosenDelivery = 4;
-                        DeliveryOption = MyEnums.DeliveryOption.Bring;
+                        selectedDelivery = MyEnums.DeliveryOption.Bring;
                         process = false;
                         break;
                     case ConsoleKey.D5:
-                        chosenDelivery = 5;
-                        DeliveryOption = MyEnums.DeliveryOption.EarlyBird;
+                        selectedDelivery = MyEnums.DeliveryOption.EarlyBird;
                         process = false;
                         break;
                 }
             }
 
-            Dictionary<string, string> deliveryDict = new();
-            deliveryDict.Add("name", name);
-            deliveryDict.Add("address", address);
-            deliveryDict.Add("deliveryOption", chosenDelivery.ToString());
-
-            PaymentMenu(deliveryDict);
-
+            Console.Clear();
+            return selectedDelivery;
         }
 
-        public void PaymentMenu(Dictionary<string, string> deliveryDict)
+        public MyEnums.PaymentOption PaymentMenu()
         {
-            CreateShoppingCartList();
-            var shoppingCartText = ShoppingCartText;
-            shoppingCartText.Add("");
+            Console.Clear();
 
-            double cost = Math.Round((((double)DeliveryOption + TotalSum) * 1.12), 2);
+            List<string> paymentInfo = new();
+            int iterator = 1;
+            foreach (var paymentOption in Enum.GetValues(typeof(MyEnums.PaymentOption)))
+            {
+                paymentInfo.Add($" [{iterator}] {paymentOption}");
+                iterator++;
+            }
 
-            shoppingCartText.Add(" Pris inklusive moms och frakt: " + cost + " kr");
 
+            var deliveryWindow = new Window("Betalnings alternativ", 15, 10, paymentInfo);
+            deliveryWindow.Left = 45;
+            deliveryWindow.Draw();
 
-
-
-            var shoppingCartWindow = new Window("Beställning", 15, 10, shoppingCartText);
-            shoppingCartWindow.Left = 45;
-            shoppingCartWindow.Draw();
 
             bool process = true;
+            MyEnums.PaymentOption selectedPayment = MyEnums.PaymentOption.Klarna;
             while (process)
             {
                 ConsoleKeyInfo input = Console.ReadKey(true);
 
                 switch (input.Key)
                 {
-                    case ConsoleKey.P:  // Purchase
-
+                    case ConsoleKey.D1:
+                        selectedPayment = MyEnums.PaymentOption.Klarna;
+                        process = false;
                         break;
-                    case ConsoleKey.X: // Cancel
+                    case ConsoleKey.D2:
+                        selectedPayment = MyEnums.PaymentOption.Swish;
+                        process = false;
+                        break;
+                    case ConsoleKey.D3:
+                        selectedPayment = MyEnums.PaymentOption.Kreditkort;
+                        process = false;
+                        break;
+                    case ConsoleKey.D4:
+                        selectedPayment = MyEnums.PaymentOption.Faktura;
                         process = false;
                         break;
                 }
             }
 
-            ShoppingCartText.Clear();
-            DeliveryOption = new MyEnums.DeliveryOption();
-            TotalSum = 0;
-            ShopPage();
+
+            Console.Clear();
+
+            return selectedPayment;
+            
         }
 
         public void CreateShoppingCartList()
@@ -690,7 +929,7 @@ namespace WebbShopBGrpD
             ShoppingCartText = shoppingCartText;
         }
 
-        public void showSearchProduts()
+        public void ShowSearchProduts()
         {
             List<string> searchedproduct = new List<string> { "                                                " };
             bool process = true;
@@ -712,7 +951,7 @@ namespace WebbShopBGrpD
 
                         if (product != null)
                         {
-                            showProductInfo(product);
+                            ShowProductInfo(product);
                         }
                         else
                         {
@@ -730,7 +969,7 @@ namespace WebbShopBGrpD
                             }
                             else
                             {
-                                showSearchProduts();
+                                ShowSearchProduts();
                             }
 
                         }

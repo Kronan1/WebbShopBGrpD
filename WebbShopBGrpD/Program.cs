@@ -10,7 +10,7 @@ namespace WebbShopBGrpD
     {
         static void Main(string[] args)
         {
-
+            
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("sv-SE");
 
           

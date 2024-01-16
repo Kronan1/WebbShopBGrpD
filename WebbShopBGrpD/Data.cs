@@ -94,10 +94,11 @@ namespace WebbShopBGrpD
         }
         public void CreateProducts()
         {
-            
+
             using (var myDb = new MyDbContext())
             {
                 List<ProductSupplier> currentSuppliers = new List<ProductSupplier>(myDb.ProductSuppliers);
+                List<ProductCategory> currentCategories = new List<ProductCategory>(myDb.ProductCategories);//Har lagt till denna Mira
                 myDb.AddRange(
                 new Product
                 {
@@ -108,7 +109,7 @@ namespace WebbShopBGrpD
                     Sale = true,
                     FeaturedProduct = true,
                     Gender = 0,
-                    ProductCategory = 0,
+                    Category = currentCategories[0],
                     Supplier = currentSuppliers[0]
 
                 },
@@ -121,7 +122,7 @@ namespace WebbShopBGrpD
                     Sale = true,
                     FeaturedProduct = true,
                     Gender = 0,
-                    ProductCategory = 1,
+                    Category = currentCategories[1],
                     Supplier = currentSuppliers[0]
 
                 },
@@ -134,7 +135,7 @@ namespace WebbShopBGrpD
                     Sale = true,
                     FeaturedProduct = true,
                     Gender = 2,
-                    ProductCategory = 2,
+                    Category = currentCategories[2],
                     Supplier = currentSuppliers[0]
 
                 },
@@ -147,7 +148,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 0,
+                    Category = currentCategories[0],
                     Supplier = currentSuppliers[0]
                 },
                 new Product
@@ -159,7 +160,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 1,
-                    ProductCategory = 1,
+                    Category = currentCategories[1],
                     Supplier = currentSuppliers[1]
                 },
                 new Product
@@ -171,7 +172,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 2,
-                    ProductCategory = 2,
+                    Category = currentCategories[2],
                     Supplier = currentSuppliers[2]
                 },
                 new Product
@@ -183,7 +184,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 1,
+                    Category = currentCategories[1],
                     Supplier = currentSuppliers[3]
                 },
                 new Product
@@ -195,7 +196,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 1,
-                    ProductCategory = 0,
+                    Category = currentCategories[0],
                     Supplier = currentSuppliers[4]
                 },
                 new Product
@@ -207,19 +208,19 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 2,
-                    ProductCategory = 2,
+                    Category = currentCategories[2],
                     Supplier = currentSuppliers[5]
                 },
                 new Product
                 {
-                    Name = "Jeanskjol",
+                    Name = "Jeans Loose Fit",
                     Price = 220,
                     Info = "100% Bomull",
                     Quantity = 22,
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 1,
+                    Category = currentCategories[1],
                     Supplier = currentSuppliers[6]
                 },
                 new Product
@@ -231,7 +232,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 1,
-                    ProductCategory = 0,
+                    Category = currentCategories[0],
                     Supplier = currentSuppliers[7]
                 },
                 new Product
@@ -243,7 +244,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 2,
-                    ProductCategory = 2,
+                    Category = currentCategories[2],
                     Supplier = currentSuppliers[8]
                 },
                 new Product
@@ -255,7 +256,7 @@ namespace WebbShopBGrpD
                     Sale = false,
                     FeaturedProduct = false,
                     Gender = 0,
-                    ProductCategory = 0,
+                    Category = currentCategories[0],
                     Supplier = currentSuppliers[9]
                 }
              );
@@ -287,12 +288,37 @@ namespace WebbShopBGrpD
                 myDb.SaveChanges();
             }
         }
+        public void CreateCategories()
+        {
+            using (var myDb = new MyDbContext())
+            {
+                myDb.AddRange(
+                    new ProductCategory
+                    {
+                        Name = "Tröjor"
+                    
+                    },
+                    new ProductCategory
+                    {
+                        Name = "Byxor"
+                    },
+                     new ProductCategory
+                     {
+                         Name = "Skor"
+                     }
+                );
+
+                myDb.SaveChanges();
+            }
+        }
 
         public void CreateData()
         {
             CreateSuppliers();
+            CreateCategories();
             CreateProducts();
             CreateCustomers();
+            
         }
     }
 }

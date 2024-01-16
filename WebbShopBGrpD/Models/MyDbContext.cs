@@ -19,5 +19,6 @@ namespace WebbShopBGrpD.Models
         public DbSet<Models.Order> Orders { get; set; }
         public DbSet<Models.ProductSupplier> ProductSuppliers { get; set; }
         public DbSet<Models.PurchasedArticles> PurchasedArticles { get; private set; }
+        public DbSet<Models.ProductCategory> ProductCategories { get; set; }
     }
 }

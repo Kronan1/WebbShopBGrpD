@@ -50,7 +50,7 @@ namespace WebbShopBGrpD
             switch (goTo)
             {
                 case "Produkter":
-                    ProductCategory(0);
+                    ProductAdmin();
                     break;
                 case "Kunder":
                     CustomerAdmin();
@@ -62,7 +62,7 @@ namespace WebbShopBGrpD
             }
 
             Console.Clear();
-            menu.StartPage();
+            AdminPage();
         }
 
 
@@ -92,8 +92,6 @@ namespace WebbShopBGrpD
             var customerWindow = new Window("Kunder", 2, 5, customersData);
             customerWindow.Left = 45;
             customerWindow.Draw();
-
-
 
             int selector = 0;
 
@@ -129,7 +127,7 @@ namespace WebbShopBGrpD
                         break;
                     case ConsoleKey.O:
                         Console.Clear();
-                        EditCustomer(customerList, selector);
+                        Customer editedCustomer = EditCustomer(customerList, selector);
                         break;
 
                     case ConsoleKey.X:
@@ -138,7 +136,9 @@ namespace WebbShopBGrpD
                 }
 
             }
+
         }
+
 
         public void SelectCustomer(List<Customer> customerList, int selector)
         {
@@ -166,7 +166,7 @@ namespace WebbShopBGrpD
 
         }
 
-        public void EditCustomer(List<Customer> customerList, int selector)
+        public Customer EditCustomer(List<Customer> customerList, int selector)
         {
             List<string> message = new List<string>()
             {
@@ -185,61 +185,97 @@ namespace WebbShopBGrpD
                 string input = "";
                 int intInput;
                 Console.SetCursorPosition(0, 10);
-                Console.WriteLine("Vänligen ange nytt namn för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange nytt namn för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.Name = input;
                 }
-                Console.WriteLine("Vänligen ange ny adress för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange ny adress för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.StreetAdress = input;
                 }
-                Console.WriteLine("Vänligen ange ett nytt postnummer för kunden");
-                if (inputCheckInt(out intInput))
+                Console.WriteLine("Vänligen ange ett nytt postnummer för kunden.");
+                if (InputCheckInt(out intInput))
                 {
                     customer.ZIPCode = intInput;
                 }
-                Console.WriteLine("Vänligen ange ett nytt stadsnamn för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange ett nytt stadsnamn för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.City = input;
                 }
-                Console.WriteLine("Vänligen ange ny ålder för kunden");
-                if (inputCheckInt(out intInput))
+                Console.WriteLine("Vänligen ange ny ålder för kunden.");
+                if (InputCheckInt(out intInput))
                 {
                     customer.Age = intInput;
                 }
-                Console.WriteLine("Vänligen ange ett nytt land för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange ett nytt land för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.Country = input;
                 }
-                Console.WriteLine("Vänligen ange ett nytt telefonnummer för kunden");
-                if (inputCheckInt(out intInput))
+                Console.WriteLine("Vänligen ange ett nytt telefonnummer för kunden.");
+                if (InputCheckInt(out intInput))
                 {
                     customer.PhoneNumber = intInput;
                 }
-                Console.WriteLine("Vänligen ange en ny mail-adress för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange en ny mail-adress för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.MailAdress = input;
                 }
-                Console.WriteLine("Vänligen ange ett nytt lösenord för kunden");
-                if (inputCheckString(out input))
+                Console.WriteLine("Vänligen ange ett nytt lösenord för kunden.");
+                if (InputCheckString(out input))
                 {
                     customer.Password = input;
                 }
+
+                return customer;
             }
             catch (Exception e)
             {
                 Console.Clear();
                 Console.SetCursorPosition(0, 10);
                 Console.WriteLine($"Error: {e.Message}");
-                Console.WriteLine("Ett fel har uppstått, vänligen försök igen");
+                Console.WriteLine("Ett fel har uppstått, vänligen försök igen.");
                 Thread.Sleep(2000);
                 Console.Clear();
-                EditCustomer(customerList, selector);
+                return EditCustomer(customerList, selector);
+            }
+        }
+
+        public void ProductAdmin()
+        {
+            Console.Clear();
+            List<string> messageBox = new List<string>
+                    {
+                        "Vänligen välj bland en av kategorierna:",
+                        " [1] Tröjor",
+                        " [2] Byxor",
+                        " [3] Skor",
+                        " [X] för att backa"
+                    };
+            var customerWindow = new Window("Kunder", 2, 5, messageBox);
+            customerWindow.Left = 45;
+            customerWindow.Draw();
+
+            ConsoleKeyInfo input;
+            input = Console.ReadKey();
+
+            switch (input.Key)
+            {
+                case ConsoleKey.D1:
+                    ProductCategory(0);
+                    break;
+                case ConsoleKey.D2:
+                    ProductCategory(1);
+                    break;
+                case ConsoleKey.D3:
+                    ProductCategory(2);
+                    break;
+                case ConsoleKey.X:
+                    return;
             }
         }
 
@@ -249,192 +285,456 @@ namespace WebbShopBGrpD
             List<Product> productsList = new();
             List<string> productData = new();
             List<string> currentProduct = new();
-
+            List<ProductCategory> categoryList = new();
             using (var myDb = new MyDbContext())
             {
                 productsList = myDb.Products.ToList();
+                categoryList = myDb.ProductCategories.ToList();
             }
 
             List<Product> categorizedProducts = new();
 
             foreach (Product product in productsList)
             {
-                if (product.ProductCategory == category)
+                foreach (ProductCategory category1 in categoryList)
                 {
-                    categorizedProducts.Add(product);
-                }
-            }
-
-            foreach (Product targetProduct in categorizedProducts)
-            {
-                productData.Add("[Produktnummer " + targetProduct.Id.ToString() + "] Produktnamn: " + targetProduct.Name);
-                productData.Add("");
-            }
-
-            productData.Add(" [K] för att se produktinformation");
-            productData.Add(" [O] för att ändra produktinformation");
-            productData.Add(" [X] för att backa");
-
-
-            Console.Clear();
-            var customerWindow = new Window(Enum.GetName(typeof(MyEnums.ProductCategory), category), 2, 5, productData);
-            customerWindow.Left = 45;
-            customerWindow.Draw();
-
-            int selector = 0;
-
-            while (true)
-            {
-                ConsoleKeyInfo input;
-                input = Console.ReadKey(true);
-                switch (input.Key)
-                {
-
-                    case ConsoleKey.K:
-                        Console.Clear();
-                        SelectProduct(categorizedProducts, selector);
-                        break;
-                    case ConsoleKey.A:
-                        Console.Clear();
-                        selector--;
-                        if (selector < 0)
-                        {
-                            selector = categorizedProducts.Count - 1;
-                        }
-                        SelectProduct(categorizedProducts, selector);
-
-                        break;
-                    case ConsoleKey.D:
-                        Console.Clear();
-                        selector++;
-                        if (selector > categorizedProducts.Count - 1)
-                        {
-                            selector = 0;
-                        }
-                        SelectProduct(categorizedProducts, selector);
-                        break;
-                    case ConsoleKey.O:
-                        Console.Clear();
-                        SelectProduct(categorizedProducts, selector);
-                        break;
-
-                    case ConsoleKey.X:
-                        return;
-
+                    if (category1.Id == category)
+                    {
+                        categorizedProducts.Add(product);
+                    }
                 }
 
-            }
+                foreach (Product targetProduct in categorizedProducts)
+                {
+                    productData.Add("[Produktnummer " + targetProduct.Id.ToString() + "] Produktnamn: " + targetProduct.Name);
+                    productData.Add("");
+                }
 
+                productData.Add(" [K] för att se produktinformation");
+                productData.Add(" [O] för att ändra produktinformation");
+                productData.Add(" [X] för att backa");
+
+
+                Console.Clear();
+                var customerWindow = new Window(((categoryList[category].Name), category).ToString(), 2, 5, productData);
+                customerWindow.Left = 45;
+                customerWindow.Draw();
+
+                int selector = 0;
+
+                while (true)
+                {
+                    ConsoleKeyInfo input;
+                    input = Console.ReadKey(true);
+                    switch (input.Key)
+                    {
+
+                        case ConsoleKey.K:
+                            Console.Clear();
+                            SelectProduct(categorizedProducts, selector);
+                            break;
+                        case ConsoleKey.A:
+                            Console.Clear();
+                            selector--;
+                            if (selector < 0)
+                            {
+                                selector = categorizedProducts.Count - 1;
+                            }
+                            SelectProduct(categorizedProducts, selector);
+
+                            break;
+                        case ConsoleKey.D:
+                            Console.Clear();
+                            selector++;
+                            if (selector > categorizedProducts.Count - 1)
+                            {
+                                selector = 0;
+                            }
+                            SelectProduct(categorizedProducts, selector);
+                            break;
+                        case ConsoleKey.O:
+                            Console.Clear();
+                            Product editedProduct = EditProduct(categorizedProducts, selector);
+                            break;
+
+                        case ConsoleKey.X:
+                            return;
+
+                    }
+
+                }
+            }
         }
-
-        public void SelectProduct(List<Product> productList, int selector)
-        {
-            List<string> currentCustomer = new List<string>();
-            currentCustomer.Add("Produktnummer: " + productList[selector].Id.ToString());
-            currentCustomer.Add("Produktnamn: " + productList[selector].Name);
-            currentCustomer.Add("Pris: " + productList[selector].Price.ToString());
-            currentCustomer.Add("Info: " + productList[selector].Info);
-            currentCustomer.Add("Saldo: " + productList[selector].Quantity.ToString());
-            if (productList[selector].Sale)
+            public void SelectProduct(List<Product> productList, int selector)
             {
-                currentCustomer.Add("Rea: Ja");
+                List<string> currentCustomer = new List<string>();
+                currentCustomer.Add("Produktnummer: " + productList[selector].Id.ToString());
+                currentCustomer.Add("Produktnamn: " + productList[selector].Name);
+                currentCustomer.Add("Pris: " + productList[selector].Price.ToString());
+                currentCustomer.Add("Info: " + productList[selector].Info);
+                currentCustomer.Add("Saldo: " + productList[selector].Quantity.ToString());
+                currentCustomer.Add("Kategori: " + productList[selector].Category.ToString());  //Lägger till här istället/Mira
+
+                if (productList[selector].Sale)
+                {
+                    currentCustomer.Add("Rea: Ja");
+                }
+                else
+                {
+                    currentCustomer.Add("Rea: Nej");
+                }
+                if (productList[selector].FeaturedProduct)
+                {
+                    currentCustomer.Add("Utvald: Ja");
+                }
+                else
+                {
+                    currentCustomer.Add("Utvald: Nej");
+                }
+
+                currentCustomer.Add("Kön: " + Enum.GetName(typeof(MyEnums.Gender), productList[selector].Gender));
+               // currentCustomer.Add("Produktkategori: " + Enum.GetName(typeof(MyEnums.ProductCategory), productList[selector].ProductCategory));
+                //currentCustomer.Add("Leverantör: " + productList[selector].Supplier.Name.ToString()); - Fungerar inte för tillfället
+                currentCustomer.Add(" [O] för att ändra uppgifter för denna produkt");
+                currentCustomer.Add(" [A] för att gå till föregående produkt");
+                currentCustomer.Add(" [D] för att gå till nästa produkt");
+                currentCustomer.Add(" [X] för att backa");
+
+                var customerViewWindow = new Window("Vald produkt", 2, 5, currentCustomer);
+                customerViewWindow.Left = 45;
+                customerViewWindow.Draw();
+
             }
-            else
+
+            public Product EditProduct(List<Product> productList, int selector)
             {
-                currentCustomer.Add("Rea: Nej");
-            }
-            if (productList[selector].FeaturedProduct)
+                List<string> message = new List<string>()
             {
-                currentCustomer.Add("Utvald: Ja");
-            }
-            else
-            {
-                currentCustomer.Add("Utvald: Nej");
-            }
-
-            currentCustomer.Add("Kön: " + Enum.GetName(typeof(MyEnums.Gender), productList[selector].Gender));
-            currentCustomer.Add("Kön: " + Enum.GetName(typeof(MyEnums.ProductCategory), productList[selector].ProductCategory));
-
-            currentCustomer.Add(" [O] för att ändra uppgifter för denna produkt");
-            currentCustomer.Add(" [A] för att gå till föregående produkt");
-            currentCustomer.Add(" [D] för att gå till nästa produkt");
-            currentCustomer.Add(" [X] för att backa");
-
-            var customerViewWindow = new Window("Vald produkt", 2, 5, currentCustomer);
-            customerViewWindow.Left = 45;
-            customerViewWindow.Draw();
-
-        }
-
-        public Product AddNewProduct()
-        {
-            Product product = new Product();
-
-            List<string> editPageList = new List<string>()
-            {
-                "Vänligen ange kundinformation för produkten du önskar att lägga till."
+                "Du ändrar för närvarande information för produkten " + productList[selector].Name + " med produktnummer: " + productList[selector].Id.ToString(),
+                "Lämna blankt för ingen ändring."
             };
 
-            var addNewCustomerWindow = new Window("Lägg till en ny kund", 2, 5, editPageList);
-            addNewCustomerWindow.Left = 25;
-            addNewCustomerWindow.Draw();
+                Product product = productList[selector];
 
-            Console.SetCursorPosition(25, 10);
-            Console.WriteLine("Vänligen ange uppgifter för kunden.");
+                var customerEditWindow = new Window("Ändring av produktdata", 2, 5, message);
+                customerEditWindow.Left = 15;
+                customerEditWindow.Draw();
 
-            return product;
-
-        }
-
-        public bool inputCheckString(out string input)
-        {
-            try
-            {
-                input = Console.ReadLine();
-                if (string.IsNullOrEmpty(input))
+                try
                 {
-                    return false;
+                    string input = "";
+                    int intInput;
+                    Console.SetCursorPosition(0, 10);
+                    Console.WriteLine("Vänligen ange ett nytt namn för produkten.");
+                    if (InputCheckString(out input))
+                    {
+                        product.Name = input;
+                    }
+                    Console.WriteLine("Vänligen ange ett nytt pris för produkten.");
+                    if (InputCheckInt(out intInput))
+                    {
+                        product.Price = intInput;
+                    }
+                    Console.WriteLine("vänligen ange ny information om produkten.");
+                    if (InputCheckString(out input))
+                    {
+                        product.Info = input;
+                    }
+                    Console.WriteLine("Vänligen ange nytt saldo för produkten.");
+                    if (InputCheckInt(out intInput))
+                    {
+                        product.Quantity = intInput;
+                    }
+                    Console.WriteLine("Vänligen ange om produkten är på rea, '1' för ja, '0' för nej.");
+                    if (InputCheckInt(out intInput))
+                    {
+                        if (intInput == 1)
+                        {
+                            product.Sale = true;
+                        }
+                        else if (intInput == 2)
+                        {
+                            product.Sale = false;
+                        }
+                    }
+                    Console.WriteLine("Vänligen ange om produkten är på en utvald produkt, '1' för ja, '0' för nej.");
+                    if (InputCheckInt(out intInput))
+                    {
+                        if (intInput == 1)
+                        {
+                            product.FeaturedProduct = true;
+                        }
+                        else if (intInput == 2)
+                        {
+                            product.FeaturedProduct = false;
+                        }
+                    }
+
+                    Console.WriteLine("Vänligen ange passande kön för produkten, '0' för man, '1' för kvinna, och '2' för unisex.");
+                    if (InputCheckInt(out intInput))
+                    {
+                        switch (intInput)
+                        {
+                            case 0:
+                                product.Gender = 0;
+                                break;
+                            case 1:
+                                product.Gender = 1;
+                                break;
+                            case 2:
+                                product.Gender = 2;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    //Väntar på ändring gällande Product.cs
+
+                    //Console.WriteLine("Vänligen ange leverantören för produkten.");
+                    //if (InputCheckInt(out intInput))
+                    //{
+                    //    if (intInput < 11)
+                    //    {
+                    //        product.Supplier = intInput;
+                    //    }
+                    //}
+
+                    return product;
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(0, 10);
+                    Console.WriteLine($"Error: {e.Message}");
+                    Console.WriteLine("Ett fel har uppstått, vänligen försök igen.");
+                    Thread.Sleep(2000);
+                    Console.Clear();
+                    return EditProduct(productList, selector);
+                }
+            }
+
+            public Product AddNewProduct()
+{
+    Product product = new Product();
+
+    List<string> editPageList = new List<string>()
+    {
+        "Vänligen ange kundinformation för produkten du önskar att lägga till."
+    };
+
+    var addNewCustomerWindow = new Window("Lägg till en ny kund", 2, 5, editPageList);
+    addNewCustomerWindow.Left = 25;
+    addNewCustomerWindow.Draw();
+
+    Console.SetCursorPosition(25, 10);
+    try
+    {
+        string input = "";
+        int intInput;
+        Console.SetCursorPosition(0, 10);
+        Console.WriteLine("Vänligen ange ett namn för produkten.");
+        product.Name = CInputCheck(out input);
+        Console.WriteLine("Vänligen ange ett pris för produkten.");
+        product.Price = CInputCheckInt(out intInput);
+        Console.WriteLine("vänligen ange information om produkten.");
+        product.Info = CInputCheck(out input);
+        Console.WriteLine("Vänligen ange saldo för produkten.");
+        product.Quantity = CInputCheckInt(out intInput);
+        Console.WriteLine("Vänligen ange om produkten är på rea, '1' för ja, '0' för nej.");
+        bool condition = false;
+        while (!condition)
+        {
+            int checker = CInputCheckInt(out intInput);
+            if (checker < 2 && checker >= 0)
+            {
+                if (intInput == 1)
+                {
+                    product.Sale = true;
                 }
                 else
                 {
-                    return true;
+                    product.Sale = false;
                 }
 
+                condition = true;
             }
-            catch
+            else
             {
-                Console.WriteLine("Felaktig inmatning, vänligen försök igen.");
-                Thread.Sleep(2000);
-                input = "";
-                return inputCheckString(out input);
+                Console.WriteLine("Vänligen ange endast 1 eller 0, '1' för ja, '0' för nej.");
             }
-
-
         }
 
-        public bool inputCheckInt(out int input)
+        Console.WriteLine("Vänligen ange om produkten är på en utvald produkt, '1' för ja, '0' för nej.");
+        condition = false;
+        while (!condition)
         {
-            try
+            int checker = CInputCheckInt(out intInput);
+            if (checker < 2 && checker >= 0)
             {
-
-                if (!int.TryParse(Console.ReadLine(), out input))
+                if (intInput == 1)
                 {
-                    return false;
+                    product.FeaturedProduct = true;
                 }
                 else
                 {
-                    return true;
+                    product.FeaturedProduct = false;
+                }
+
+                condition = true;
+            }
+            else
+            {
+                Console.WriteLine("Vänligen ange endast 1 eller 0, '1' för ja, '0' för nej.");
+            }
+        }
+
+
+        Console.WriteLine("Vänligen ange passande kön för produkten, '0' för man, '1' för kvinna, och '2' för unisex.");
+        condition = false;
+        int checker2 = CInputCheckInt(out intInput);
+        while (!condition)
+        {
+            if (checker2 < 3 && checker2 >= 0)
+            {
+                switch (intInput)
+                {
+                    case 0:
+                        product.Gender = 0;
+                        break;
+                    case 1:
+                        product.Gender = 1;
+                        break;
+                    case 2:
+                        product.Gender = 2;
+                        break;
+                }
+                condition = true;
+            }
+            else
+            {
+                Console.WriteLine("Vänligen ange endast 0, 1, eller 2, '0' för man, '1' för kvinna, och '2' för unisex.");
+            }
+        }
+
+
+
+        //Väntar på ändring gällande Product.cs
+
+        //Console.WriteLine("Vänligen ange leverantören för produkten.");
+        //if (InputCheckInt(out intInput))
+        //{
+        //    if (intInput < 11)
+        //    {
+        //        product.Supplier = intInput;
+        //    }
+        //}
+
+    }
+    catch (Exception e)
+    {
+        Console.Clear();
+        Console.SetCursorPosition(0, 10);
+        Console.WriteLine($"Error: {e.Message}");
+        Console.WriteLine("Ett fel har uppstått, vänligen försök igen.");
+        Thread.Sleep(2000);
+        Console.Clear();
+        //return AddNewProduct(productList, selector);
+    }
+
+    return product;
+}
+
+            public bool InputCheckString(out string input)
+            {
+                try
+                {
+                    input = Console.ReadLine();
+                    if (string.IsNullOrEmpty(input))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+                catch
+                {
+                    Console.WriteLine("Felaktig inmatning, vänligen försök igen.");
+                    Thread.Sleep(2000);
+                    input = "";
+                    return InputCheckString(out input);
+                }
+
+
+            }
+
+            public bool InputCheckInt(out int input)
+            {
+                try
+                {
+
+                    if (!int.TryParse(Console.ReadLine(), out input))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+                catch
+                {
+                    Console.WriteLine("Felaktig inmatning, vänligen försök igen.");
+                    Thread.Sleep(2000);
+                    return InputCheckInt(out input);
                 }
 
             }
-            catch
-            {
-                Console.WriteLine("Felaktig inmatning, vänligen försök igen.");
-                Thread.Sleep(2000);
-                return inputCheckInt(out input);
-            }
-
-
+			
+			public string CInputCheck(out string input)
+{
+    try
+    {
+        input = Console.ReadLine();
+        while (string.IsNullOrEmpty(input))
+        {
+            Console.WriteLine("Felaktigt värde");
+            input = Console.ReadLine();
         }
+        return input;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.WriteLine("Fel har uppstått, vänligen försök igen.");
+        return CInputCheck(out input);
     }
 }
+
+public int CInputCheckInt(out int input)
+{
+    try
+    {
+        while (!int.TryParse(Console.ReadLine(), out input))
+        {
+            Console.WriteLine("Felaktig inmatning, vänligen ange endast siffror.");
+            Thread.Sleep(2000);
+        }
+        return input;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.WriteLine("Fel har uppstått, vänligen försök igen.");
+        return CInputCheckInt(out input);
+    }
+}
+        
+    }
+}
+    
+ 
