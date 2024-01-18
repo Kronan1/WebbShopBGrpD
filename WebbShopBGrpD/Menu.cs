@@ -213,6 +213,8 @@ namespace WebbShopBGrpD
                 categoriesList.Add($" [{chars[iterator]}] = " + category.ToString());
                 iterator++;
             }
+
+            categoriesList.Add(" [Z] = Sök");
             var categoriesWindow = new Window("Categories", 15, 10, categoriesList);
             categoriesWindow.Left = 15;
             categoriesWindow.Draw();
@@ -346,43 +348,25 @@ namespace WebbShopBGrpD
                             bool processProduct = true;
                             while (processProduct)
                             {
-
-                                //!!! Den nuvarande produkten som värdet ska ändras på behöver plockas ut ur amountPerProduct för att sen kunna användas när värdet ska skrivas ut i "window"-metoden. !!!
-
-
-                                //var currentProduct = products[input2 - 1];
-
-
-
-                                //int currentProductAmount = 0;
-                                //foreach (var product2 in ShoppingCart)
-                                //{
-                                //    if (product2 == currentProduct)
-                                //    {
-                                //        currentProductAmount++;
-                                //    }
-                                //}
-
-                                //foreach (var product in ShoppingCart)
-                                //{
-                                //    amountPerProduct[product] += 1;
-                                //}
+                                Product currentProduct = new Product();
 
                                 amountPerProduct = CalculateShoppingCart();
 
-                                for (int i = 0; i < amountPerProduct.Count; i++)
+                                int iterator = 1;
+                                int amount = 0;
+                                foreach (var product in amountPerProduct)
                                 {
-                                    
+                                    if (iterator == input2)
+                                    {
+                                        currentProduct = product.Key;
+                                        amount = product.Value;
+                                    }
+                                    iterator++;
                                 }
-
-                                
-
-                                Product currentProduct = new Product();
-
 
                                 List<string> currentProductList = new();
                                 currentProductList.Add(" " + currentProduct.Name);
-                                currentProductList.Add(" Antal : " + amountPerProduct[currentProduct]);
+                                currentProductList.Add(" Antal : " + amount);
                                 currentProductList.Add(" ");
                                 currentProductList.Add(" [A] för att minska antal");
                                 currentProductList.Add(" [D] för att öka antal");
@@ -400,7 +384,8 @@ namespace WebbShopBGrpD
                                     case ConsoleKey.A:
                                         if (ShoppingCart.Contains(currentProduct))
                                         {
-                                            ShoppingCart.Remove(currentProduct);
+                                            var indexToRemove = ShoppingCart.FindLastIndex(x => x.Id == currentProduct.Id);
+                                            ShoppingCart.RemoveAt(indexToRemove);
                                         }
                                         break;
                                     case ConsoleKey.D:
@@ -986,6 +971,8 @@ namespace WebbShopBGrpD
         {
             List<string> searchedproduct = new List<string> { "                                                " };
             bool process = true;
+            string goTo = "";
+            Product? product = null;
             while (process)
             {
 
@@ -1000,11 +987,12 @@ namespace WebbShopBGrpD
                     using (var myDb = new MyDbContext())
                     {
 
-                        Product? product = myDb.Products.FirstOrDefault(p => p.Name.ToLower().StartsWith(search));
+                        product = myDb.Products.FirstOrDefault(p => p.Name.ToLower().StartsWith(search));
 
                         if (product != null)
                         {
-                            ShowProductInfo(product);
+                            goTo = "ShowProductInfo";
+                            break;
                         }
                         else
                         {
@@ -1017,12 +1005,13 @@ namespace WebbShopBGrpD
                             {
                                 process = false;
                                 Console.Clear();
-                                ShopPage();
+                                goTo = "ShopPage";
                                 break;
                             }
                             else
                             {
-                                ShowSearchProduts();
+                                goTo = "ShowSearchProducts";
+                                break;
                             }
 
                         }
@@ -1039,9 +1028,23 @@ namespace WebbShopBGrpD
                     Console.WriteLine("Skriv in minst tre bokstäver");
                     Thread.Sleep(1000);
                     Console.Clear();
-                    ShopPage();
+                    goTo = "ShopPage";
+                    break;
                 }
 
+            }
+
+            switch (goTo)
+            {
+                case "ShopPage":
+                    ShopPage();
+                    break;
+                case "ShowSearchProducts":
+                    ShowSearchProduts();
+                    break;
+                case "ShowProductInfo":
+                    ShowProductInfo(product);
+                    break;
             }
         }
 
