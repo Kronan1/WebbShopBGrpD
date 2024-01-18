@@ -286,7 +286,7 @@ namespace WebbShopBGrpD
             List<string> productData = new();
             List<string> currentProduct = new();
             List<ProductCategory> categoryList = new();
-
+            List<ProductSupplier> supplierList = new();
 
 
 
@@ -294,6 +294,8 @@ namespace WebbShopBGrpD
             {
                 productsList = myDb.Products.Where(x => x.Category.Id == category).ToList();
                 categoryList = myDb.ProductCategories.ToList();
+                supplierList = myDb.ProductSuppliers.ToList();
+                
             }
 
 
@@ -310,6 +312,11 @@ namespace WebbShopBGrpD
                 }
 
             }
+
+            //foreach (Product product in categorizedProducts)
+            //{
+            //    product.Supplier = supplierList[product.Supplier.Id];
+            //}
 
                 foreach (Product targetProduct in categorizedProducts)
                 {
@@ -380,7 +387,9 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Pris: " + productList[selector].Price.ToString());
             currentCustomer.Add("Info: " + productList[selector].Info);
             currentCustomer.Add("Saldo: " + productList[selector].Quantity.ToString());
-            currentCustomer.Add("Kategori: " + productList[selector].Category.ToString());  //Lägger till här istället/Mira
+            currentCustomer.Add("Kategori: " + productList[selector].Category.Name.ToString());
+            //currentCustomer.Add("Supplier: " + productList[selector].Supplier.Name.ToString());
+            
 
             if (productList[selector].Sale)
             {
@@ -459,7 +468,7 @@ namespace WebbShopBGrpD
                     {
                         product.Sale = true;
                     }
-                    else if (intInput == 2)
+                    else if (intInput == 0)
                     {
                         product.Sale = false;
                     }
@@ -471,7 +480,7 @@ namespace WebbShopBGrpD
                     {
                         product.FeaturedProduct = true;
                     }
-                    else if (intInput == 2)
+                    else if (intInput == 0)
                     {
                         product.FeaturedProduct = false;
                     }
@@ -496,16 +505,14 @@ namespace WebbShopBGrpD
                     }
                 }
 
-                //Väntar på ändring gällande Product.cs
-
-                //Console.WriteLine("Vänligen ange leverantören för produkten.");
-                //if (InputCheckInt(out intInput))
-                //{
-                //    if (intInput < 11)
-                //    {
-                //        product.Supplier = intInput;
-                //    }
-                //}
+                Console.WriteLine("Vänligen ange leverantören för produkten.");
+                if (InputCheckInt(out intInput))
+                {
+                    if (intInput < 11)
+                    {
+                        product.Supplier.Id = intInput;
+                    }
+                }
 
                 return product;
             }
