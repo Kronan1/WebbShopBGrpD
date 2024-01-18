@@ -10,13 +10,12 @@ namespace WebbShopBGrpD
     {
         public enum DeliveryOption
         {
-            Postnord = 50,
-            Dhl = 75,
-            Schenker = 60,
+            Postnord = 45,
             Bring = 49,
+            Schenker = 55,
+            Dhl = 60,
             EarlyBird = 64
         }
-
 
         public enum PaymentOption
         {

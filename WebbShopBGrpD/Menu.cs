@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebbShopBGrpD.Models;
 using WindowDemo;
+using static WebbShopBGrpD.MyEnums;
 
 namespace WebbShopBGrpD
 {
@@ -364,6 +366,11 @@ namespace WebbShopBGrpD
                                     iterator++;
                                 }
 
+                                if (currentProduct.Id == 0)
+                                {
+                                    break;
+                                }
+
                                 List<string> currentProductList = new();
                                 currentProductList.Add(" " + currentProduct.Name);
                                 currentProductList.Add(" Antal : " + amount);
@@ -423,7 +430,10 @@ namespace WebbShopBGrpD
                 }
                 else if (input.Key == ConsoleKey.K)
                 {
-                    Purchase();
+                    if (!ShoppingCart.IsNullOrEmpty())
+                    {
+                        Purchase();
+                    }
                     Console.Clear();
                 }
             }
@@ -595,9 +605,9 @@ namespace WebbShopBGrpD
             {
                 connection.Open();
 
-                var sql = "SELECT * FROM Customer WHERE MailAdress = @email";
+                var sql = "SELECT * FROM Customers WHERE MailAdress = @Email";
 
-                customer = connection.QuerySingleOrDefault<Customer>(sql);
+                customer = connection.QuerySingleOrDefault<Customer>(sql, new {Email = email});
             }
 
 
@@ -747,49 +757,40 @@ namespace WebbShopBGrpD
                         using (var myDb = new MyDbContext())
                         {
                             List<PurchasedArticles> purchasedArticlesList = new();
-                            Dictionary<Product, int> productDict = new();
-                            Order order = new Order();
-                            foreach (var product in ShoppingCart)
-                            {
-                                if (productDict.ContainsKey(product))
-                                {
-                                    productDict[product] += 1;
-                                }
-                                else
-                                {
-                                    productDict.Add(product, 1);
-                                }
-
-                            }
+                            Dictionary<Product, int> productDict = CalculateShoppingCart();
+                            
+                            
 
                             foreach (var product in myDb.Products)
                             {
                                 foreach (var product2 in productDict)
                                 {
-                                    if (product.Name == product2.Key.Name)
+                                    if (product.Id == product2.Key.Id)
                                     {
                                         product.Quantity -= product2.Value;
                                     }
                                 }
                             }
 
-                            PurchasedArticles purchasedArticles = new();
+                            
                             foreach (var product in productDict)
                             {
+                                PurchasedArticles purchasedArticles = new();
                                 purchasedArticles.Product = product.Key;
                                 purchasedArticles.Quantity = product.Value;
-                                purchasedArticles.Order = order;
                                 purchasedArticlesList.Add(purchasedArticles);
                             }
 
-
+                            Order order = new Order();
                             order.Customer = customer;
-                            order.DeliveryOption = (int)deliveryOption;
+                            order.DeliveryOption = Array.IndexOf(Enum.GetValues(typeof(MyEnums.DeliveryOption)), deliveryOption);
                             order.PaymentOption = (int)paymentOption;
                             order.PurchasedArticles = purchasedArticlesList;
+                            order.CustomerId = customer.Id;
 
-                            //order.PurchasedArticles = ShoppingCart; Behöver fixa med purchasedArticles
-                            //myDb.Orders.Add();
+                            
+                            myDb.Orders.Add(order);
+                            myDb.SaveChanges();
                         }
                         break;
                     case ConsoleKey.X:
@@ -818,7 +819,7 @@ namespace WebbShopBGrpD
             Console.Clear();
             List<string> deliveryInfo = new();
             int iterator = 1;
-            foreach (var deliveryOption in Enum.GetValues(typeof(MyEnums.DeliveryOption)))
+            foreach (var deliveryOption in Enum.GetValues(typeof(DeliveryOption)))
             {
                 deliveryInfo.Add($" [{iterator}] {deliveryOption} = {(int)deliveryOption} kr");
                 iterator++;
@@ -841,7 +842,7 @@ namespace WebbShopBGrpD
                         process = false;
                         break;
                     case ConsoleKey.D2:
-                        selectedDelivery = MyEnums.DeliveryOption.Dhl;
+                        selectedDelivery = MyEnums.DeliveryOption.Bring;
                         process = false;
                         break;
                     case ConsoleKey.D3:
@@ -849,7 +850,7 @@ namespace WebbShopBGrpD
                         process = false;
                         break;
                     case ConsoleKey.D4:
-                        selectedDelivery = MyEnums.DeliveryOption.Bring;
+                        selectedDelivery = MyEnums.DeliveryOption.Dhl;
                         process = false;
                         break;
                     case ConsoleKey.D5:

@@ -15,6 +15,7 @@ namespace WebbShopBGrpD.Models
         public int Id { get; set; }
         public int PaymentOption { get; set; }
         public int DeliveryOption { get; set; }
+        public int CustomerId { get; set; }
 
         public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
         public virtual Customer Customer { get; set; }
