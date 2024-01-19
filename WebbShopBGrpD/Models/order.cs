@@ -18,6 +18,6 @@ namespace WebbShopBGrpD.Models
         public int CustomerId { get; set; }
 
         public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
-        public virtual Customer Customer { get; set; }
+        // public virtual Customer Customer { get; set; }
     }
 }

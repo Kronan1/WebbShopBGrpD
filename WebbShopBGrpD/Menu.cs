@@ -607,7 +607,7 @@ namespace WebbShopBGrpD
 
                 var sql = "SELECT * FROM Customers WHERE MailAdress = @Email";
 
-                customer = connection.QuerySingleOrDefault<Customer>(sql, new {Email = email});
+                customer = connection.QuerySingleOrDefault<Customer>(sql, new { Email = email });
             }
 
 
@@ -758,8 +758,8 @@ namespace WebbShopBGrpD
                         {
                             List<PurchasedArticles> purchasedArticlesList = new();
                             Dictionary<Product, int> productDict = CalculateShoppingCart();
-                            
-                            
+
+
 
                             foreach (var product in myDb.Products)
                             {
@@ -772,25 +772,51 @@ namespace WebbShopBGrpD
                                 }
                             }
 
-                            
+
                             foreach (var product in productDict)
                             {
                                 PurchasedArticles purchasedArticles = new();
-                                purchasedArticles.Product = product.Key;
+                                purchasedArticles.ProductId = product.Key.Id;
                                 purchasedArticles.Quantity = product.Value;
                                 purchasedArticlesList.Add(purchasedArticles);
                             }
 
                             Order order = new Order();
-                            order.Customer = customer;
+                            order.CustomerId = customer.Id;
                             order.DeliveryOption = Array.IndexOf(Enum.GetValues(typeof(MyEnums.DeliveryOption)), deliveryOption);
                             order.PaymentOption = (int)paymentOption;
-                            order.PurchasedArticles = purchasedArticlesList;
-                            order.CustomerId = customer.Id;
 
-                            
+
+
                             myDb.Orders.Add(order);
                             myDb.SaveChanges();
+
+
+                            foreach (var purchasedArticle in purchasedArticlesList)
+                            {
+                                myDb.PurchasedArticles.Add(purchasedArticle);
+                            }
+
+                            myDb.SaveChanges();
+
+                            Order currentOrder = myDb.Orders
+                                .OrderByDescending(x => x.Id)
+                                .FirstOrDefault();
+
+                            List<PurchasedArticles> currentPurchasedArticlesList = myDb.PurchasedArticles
+                                                        .OrderByDescending(x => x.Id)
+                                                        .Take(purchasedArticlesList.Count())
+                                                        .ToList();
+
+                            foreach (var item in currentPurchasedArticlesList)
+                            {
+                                currentOrder.PurchasedArticles.Add(item);
+                            }
+
+                            myDb.Orders.Update(currentOrder); // Order.PurchasedArticles är fortfarande tom 
+
+                            myDb.SaveChanges();
+
                         }
                         break;
                     case ConsoleKey.X:

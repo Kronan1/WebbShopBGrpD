@@ -8,10 +8,6 @@ namespace WebbShopBGrpD.Models
 {
     internal class Product
     {
-        public Product()
-        {
-            PurchasedArticles = new HashSet<PurchasedArticles>();
-        }
         public int Id { get; set; }
         public string Name { get; set; }
         public float Price { get; set; }
@@ -23,6 +19,5 @@ namespace WebbShopBGrpD.Models
 
         public virtual ProductCategory Category { get; set; }
         public virtual ProductSupplier Supplier { get; set; }
-        public virtual ICollection<PurchasedArticles> PurchasedArticles { get; set; }
     }
 }

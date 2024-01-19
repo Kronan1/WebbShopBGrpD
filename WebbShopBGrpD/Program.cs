@@ -13,7 +13,9 @@ namespace WebbShopBGrpD
             
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("sv-SE");
 
-          
+            
+
+
             //List<Product> products = new List<Product>();
             //List<ProductSupplier> suppliers = new List<ProductSupplier>();
             
@@ -21,8 +23,11 @@ namespace WebbShopBGrpD
 
             //using (var myDb = new MyDbContext())
             //{
-            //    products = myDb.Products.ToList();
-            //    suppliers = myDb.ProductSuppliers.ToList();
+            //    var order = myDb.Orders.OrderBy(x => x.Id)
+            //        .Last();
+
+            //    var pa = order.PurchasedArticles;
+            //    int test = 0;
             //}
 
 
