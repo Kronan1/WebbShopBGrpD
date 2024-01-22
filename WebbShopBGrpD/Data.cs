@@ -9,7 +9,7 @@ namespace WebbShopBGrpD
 {
     internal class Data
     {
-        public void CreateSuppliers()
+        public static void CreateSuppliers()
         {
             using (var myDb = new MyDbContext())
             {
@@ -92,7 +92,7 @@ namespace WebbShopBGrpD
 
             }
         }
-        public void CreateProducts()
+        public static void CreateProducts()
         {
 
             using (var myDb = new MyDbContext())
@@ -266,7 +266,7 @@ namespace WebbShopBGrpD
 
         }
 
-        public void CreateCustomers()
+        public static void CreateCustomers()
         {
             using (var myDb = new MyDbContext())
             {
@@ -288,7 +288,7 @@ namespace WebbShopBGrpD
                 myDb.SaveChanges();
             }
         }
-        public void CreateCategories()
+        public static void CreateCategories()
         {
             using (var myDb = new MyDbContext())
             {
@@ -312,7 +312,7 @@ namespace WebbShopBGrpD
             }
         }
 
-        public void CreateData()
+        public static void CreateData()
         {
             CreateSuppliers();
             CreateCategories();
