@@ -17,6 +17,7 @@ namespace WebbShopBGrpD
             // Kör en gång för att skapa data
             //Data.CreateData(); 
 
+
             Menu menu = new Menu();
 
             menu.StartPage();
