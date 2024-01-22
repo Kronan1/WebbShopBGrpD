@@ -9,7 +9,7 @@ namespace WebbShopBGrpD
 {
     internal class Data
     {
-        public void CreateSuppliers()
+        public static void CreateSuppliers()
         {
             using (var myDb = new MyDbContext())
             {
@@ -92,7 +92,7 @@ namespace WebbShopBGrpD
 
             }
         }
-        public void CreateProducts()
+        public static void CreateProducts()
         {
 
             using (var myDb = new MyDbContext())
@@ -258,6 +258,30 @@ namespace WebbShopBGrpD
                     Gender = 0,
                     Category = currentCategories[0],
                     Supplier = currentSuppliers[9]
+                },
+                new Product
+                {
+                    Name = "Klackskor",
+                    Price = 250,
+                    Info = "Läder",
+                    Quantity = 20,
+                    Sale = false,
+                    FeaturedProduct = false,
+                    Gender = 1,
+                    Category = currentCategories[2],
+                    Supplier = currentSuppliers[9]
+                },
+                new Product
+                {
+                    Name = "Mamma jeans",
+                    Price = 200,
+                    Info = "100% Bomull",
+                    Quantity = 22,
+                    Sale = false,
+                    FeaturedProduct = false,
+                    Gender = 1,
+                    Category = currentCategories[1],
+                    Supplier = currentSuppliers[6]
                 }
              );
 
@@ -266,7 +290,7 @@ namespace WebbShopBGrpD
 
         }
 
-        public void CreateCustomers()
+        public static void CreateCustomers()
         {
             using (var myDb = new MyDbContext())
             {
@@ -282,13 +306,73 @@ namespace WebbShopBGrpD
                         PhoneNumber = 0700523374,
                         MailAdress = "MartinSvensson@gmail.com",
                         Password = "password"
+                    },
+                    new Customer
+                    {
+                        Name = "Anna Andersson",
+                        Age = 30,
+                        StreetAdress = "Storgatan 15",
+                        ZIPCode = 11234,
+                        City = "Stockholm",
+                        Country = "Sverige",
+                        PhoneNumber = 0731122233,
+                        MailAdress = "Anna.Andersson@email.com",
+                        Password = "secure123"
+                    },
+                    new Customer
+                    {
+                        Name = "Erik Andersson",
+                        Age = 28,
+                        StreetAdress = "Björkgatan 8",
+                        ZIPCode = 41155,
+                        City = "Gothenburg",
+                        Country = "Sverige",
+                        PhoneNumber = 0765566778,
+                        MailAdress = "Erik.Andersson@hotmail.com",
+                        Password = "pass1234"
+                    },
+                    new Customer
+                    {
+                        Name = "Sofia Lindqvist",
+                        Age = 22,
+                        StreetAdress = "Sveavägen 10",
+                        ZIPCode = 21145,
+                        City = "Malmö",
+                        Country = "Sverige",
+                        PhoneNumber = 0709876543,
+                        MailAdress = "Sofia.Lindqvist@email.com",
+                        Password = "securePwd"
+                    },
+                    new Customer
+                    {
+                        Name = "David Berggren",
+                        Age = 35,
+                        StreetAdress = "Götgatan 33",
+                        ZIPCode = 55123,
+                        City = "Uppsala",
+                        Country = "Sverige",
+                        PhoneNumber = 0723344556,
+                        MailAdress = "David.Berggren@gmail.com",
+                        Password = "passWord456"
+                    },
+                    new Customer
+                    {
+                        Name = "Maria Karlsson",
+                        Age = 27,
+                        StreetAdress = "Drottninggatan 5",
+                        ZIPCode = 33111,
+                        City = "Linköping",
+                        Country = "Sverige",
+                        PhoneNumber = 0701122334,
+                        MailAdress = "Maria.Karlsson@email.com",
+                        Password = "mySecurePwd"
                     }
                 );
 
                 myDb.SaveChanges();
             }
         }
-        public void CreateCategories()
+        public static void CreateCategories()
         {
             using (var myDb = new MyDbContext())
             {
@@ -296,7 +380,7 @@ namespace WebbShopBGrpD
                     new ProductCategory
                     {
                         Name = "Tröjor"
-                    
+
                     },
                     new ProductCategory
                     {
@@ -311,14 +395,151 @@ namespace WebbShopBGrpD
                 myDb.SaveChanges();
             }
         }
+        public static void CreateOrders()
+        {
+            //public int PaymentOption { get; set; }
+            //public int DeliveryOption { get; set; }
+            //public int CustomerId { get; set; }
 
-        public void CreateData()
+            using (var myDb = new MyDbContext())
+            {
+                myDb.AddRange(
+                    new Order { PaymentOption = 1, DeliveryOption = 2, CustomerId = 1 },
+                    new Order { PaymentOption = 2, DeliveryOption = 3, CustomerId = 2 },
+                    new Order { PaymentOption = 3, DeliveryOption = 4, CustomerId = 3 },
+                    new Order { PaymentOption = 4, DeliveryOption = 5, CustomerId = 4 },
+                    new Order { PaymentOption = 1, DeliveryOption = 1, CustomerId = 5 },
+                    new Order { PaymentOption = 2, DeliveryOption = 2, CustomerId = 6 },
+                    new Order { PaymentOption = 3, DeliveryOption = 3, CustomerId = 1 },
+                    new Order { PaymentOption = 4, DeliveryOption = 4, CustomerId = 2 },
+                    new Order { PaymentOption = 1, DeliveryOption = 5, CustomerId = 3 },
+                    new Order { PaymentOption = 2, DeliveryOption = 1, CustomerId = 4 },
+                    new Order { PaymentOption = 3, DeliveryOption = 2, CustomerId = 5 },
+                    new Order { PaymentOption = 4, DeliveryOption = 3, CustomerId = 6 },
+                    new Order { PaymentOption = 1, DeliveryOption = 4, CustomerId = 1 },
+                    new Order { PaymentOption = 2, DeliveryOption = 5, CustomerId = 2 },
+                    new Order { PaymentOption = 3, DeliveryOption = 1, CustomerId = 3 },
+                    new Order { PaymentOption = 4, DeliveryOption = 2, CustomerId = 4 },
+                    new Order { PaymentOption = 1, DeliveryOption = 3, CustomerId = 5 },
+                    new Order { PaymentOption = 2, DeliveryOption = 4, CustomerId = 6 },
+                    new Order { PaymentOption = 3, DeliveryOption = 5, CustomerId = 1 },
+                    new Order { PaymentOption = 4, DeliveryOption = 1, CustomerId = 2 },
+                    new Order { PaymentOption = 1, DeliveryOption = 2, CustomerId = 3 },
+                    new Order { PaymentOption = 2, DeliveryOption = 3, CustomerId = 4 },
+                    new Order { PaymentOption = 3, DeliveryOption = 4, CustomerId = 5 },
+                    new Order { PaymentOption = 4, DeliveryOption = 5, CustomerId = 6 },
+                    new Order { PaymentOption = 2, DeliveryOption = 2, CustomerId = 1 },
+                    new Order { PaymentOption = 3, DeliveryOption = 3, CustomerId = 3 }
+                    );
+
+                myDb.SaveChanges();
+            }
+         }
+        public static void CreatePurchasedArticles()
+        {
+            using (var myDb = new MyDbContext())
+            {
+                myDb.AddRange(
+                    new PurchasedArticles { Quantity = 1, ProductId = 14, OrderId = 1 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 2, OrderId = 1 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 4, OrderId = 1 },
+
+                    new PurchasedArticles { Quantity = 3, ProductId = 5, OrderId = 2 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 8, OrderId = 2 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 12, OrderId = 2 },
+
+                    new PurchasedArticles { Quantity = 5, ProductId = 3, OrderId = 3 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 11, OrderId = 3 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 6, OrderId = 3 },
+
+                    new PurchasedArticles { Quantity = 2, ProductId = 9, OrderId = 4 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 14, OrderId = 4 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 2, OrderId = 4 },
+
+                    new PurchasedArticles { Quantity = 1, ProductId = 7, OrderId = 5 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 10, OrderId = 5 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 13, OrderId = 5 },
+
+                    new PurchasedArticles { Quantity = 4, ProductId = 4, OrderId = 6 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 1, OrderId = 6 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 15, OrderId = 6 },
+
+                    new PurchasedArticles { Quantity = 3, ProductId = 7, OrderId = 7 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 11, OrderId = 7 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 3, OrderId = 7 },
+
+                    new PurchasedArticles { Quantity = 5, ProductId = 8, OrderId = 8 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 14, OrderId = 8 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 5, OrderId = 8 },
+
+                    new PurchasedArticles { Quantity = 2, ProductId = 9, OrderId = 9 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 13, OrderId = 9 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 2, OrderId = 9 },
+
+                    new PurchasedArticles { Quantity = 1, ProductId = 6, OrderId = 10 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 10, OrderId = 10 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 15, OrderId = 10 },
+
+                    new PurchasedArticles { Quantity = 4, ProductId = 4, OrderId = 11 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 1, OrderId = 11 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 14, OrderId = 11 },
+
+                    new PurchasedArticles { Quantity = 3, ProductId = 5, OrderId = 12 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 8, OrderId = 12 },
+
+                    new PurchasedArticles { Quantity = 4, ProductId = 12, OrderId = 13 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 3, OrderId = 13 },
+
+                    new PurchasedArticles { Quantity = 1, ProductId = 11, OrderId = 14 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 6, OrderId = 14 },
+
+                    new PurchasedArticles { Quantity = 2, ProductId = 9, OrderId = 15 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 14, OrderId = 15 },
+
+                    new PurchasedArticles { Quantity = 5, ProductId = 2, OrderId = 16 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 7, OrderId = 16 },
+
+                    new PurchasedArticles { Quantity = 3, ProductId = 10, OrderId = 17 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 13, OrderId = 17 },
+
+                    new PurchasedArticles { Quantity = 4, ProductId = 4, OrderId = 18 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 1, OrderId = 18 },
+
+                    new PurchasedArticles { Quantity = 1, ProductId = 15, OrderId = 19 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 7, OrderId = 19 },
+
+                    new PurchasedArticles { Quantity = 2, ProductId = 11, OrderId = 20 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 3, OrderId = 20 },
+
+                    new PurchasedArticles { Quantity = 5, ProductId = 8, OrderId = 21 },
+                    new PurchasedArticles { Quantity = 1, ProductId = 14, OrderId = 21 },
+
+                    new PurchasedArticles { Quantity = 3, ProductId = 5, OrderId = 22 },
+                    new PurchasedArticles { Quantity = 2, ProductId = 9, OrderId = 22 },
+
+                    new PurchasedArticles { Quantity = 4, ProductId = 13, OrderId = 23 },
+                    new PurchasedArticles { Quantity = 5, ProductId = 2, OrderId = 23 },
+
+                    new PurchasedArticles { Quantity = 1, ProductId = 6, OrderId = 24 },
+                    new PurchasedArticles { Quantity = 3, ProductId = 10, OrderId = 24 },
+
+                    new PurchasedArticles { Quantity = 2, ProductId = 15, OrderId = 25 },
+                    new PurchasedArticles { Quantity = 4, ProductId = 4, OrderId = 25 },
+
+                    new PurchasedArticles { Quantity = 5, ProductId = 1, OrderId = 26 }
+                    );
+                myDb.SaveChanges();
+            }
+        }
+        public static void CreateData()
         {
             CreateSuppliers();
             CreateCategories();
             CreateProducts();
             CreateCustomers();
-            
+            CreateOrders();
+            CreatePurchasedArticles();
+
         }
     }
 }

@@ -158,6 +158,9 @@ namespace WebbShopBGrpD
                             goTo = "Category3";
                             process = false;
                             break;
+                        case ConsoleKey.Z:
+                            goTo = "ShowSearchProducts";
+                            break;
 
 
                     }
@@ -193,6 +196,10 @@ namespace WebbShopBGrpD
                         ShoppingCart.Add(featuredProducts[2]);
                         StartPage();
                         break;
+                    case "ShowSearchedProducts":
+                        ShowSearchProduts();
+                        break;
+                        
                 }
 
 
@@ -439,21 +446,6 @@ namespace WebbShopBGrpD
             }
         }
 
-
-        //int quantity = 0;
-        //for (int i = 0; i < productsInCart; i++)
-        //{
-        //    foreach (var product in ShoppingCart)
-        //    {
-        //        if (product.Id == ShoppingCart[i].Id)
-        //        {
-        //            quantity++;
-        //        }
-        //    }
-
-        //}
-
-
         public void ShowProductCategories(int category)
         {
             List<Product> products;
@@ -641,7 +633,7 @@ namespace WebbShopBGrpD
             int zipCode = 0;
             do
             {
-                Console.Write("Postnummer");
+                Console.Write("Postnummer: ");
                 if (!int.TryParse(Console.ReadLine(), out zipCode))
                 {
                     Console.WriteLine(" Ett nummer mellan 10000 och 99999");
@@ -689,7 +681,7 @@ namespace WebbShopBGrpD
             } while (phoneNumber < 1);
             Console.Clear();
 
-            Console.WriteLine("Lösenord: ");
+            Console.Write("Lösenord: ");
             var password = Console.ReadLine();
             Console.Clear();
 
@@ -740,7 +732,7 @@ namespace WebbShopBGrpD
             customerInfo.Add(" Pris: " + ((TotalSum + (int)deliveryOption) * 1.25).ToString());
             customerInfo.Add(" ");
             customerInfo.Add(" [K] Slutför köp");
-            customerInfo.Add(" [X] Avbryt köp");
+
 
             var customerWindow = new Window("Kund", 15, 5, customerInfo);
             customerWindow.Left = 45;
@@ -798,43 +790,16 @@ namespace WebbShopBGrpD
                             }
 
                             myDb.SaveChanges();
-
-                            Order currentOrder = myDb.Orders
-                                .OrderByDescending(x => x.Id)
-                                .FirstOrDefault();
-
-                            List<PurchasedArticles> currentPurchasedArticlesList = myDb.PurchasedArticles
-                                                        .OrderByDescending(x => x.Id)
-                                                        .Take(purchasedArticlesList.Count())
-                                                        .ToList();
-
-                            foreach (var item in currentPurchasedArticlesList)
-                            {
-                                currentOrder.PurchasedArticles.Add(item);
-                            }
-
-                            myDb.Orders.Update(currentOrder); // Order.PurchasedArticles är fortfarande tom 
-
-                            myDb.SaveChanges();
+                            process = false;
 
                         }
+                        Console.Clear();
                         break;
-                    case ConsoleKey.X:
-                        string connectionString = "Server=.\\SQLExpress;Database=WebbShopB;Trusted_Connection=True;TrustServerCertificate=True;";
 
-                        int customerId = customer.Id;
-                        using (var connection = new SqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            var sql = "DELETE FROM Customer WHERE Id = @CustomerId";
-
-                            customer = connection.QuerySingleOrDefault<Customer>(sql, new{CustomerId = customerId });
-                        }
-                        process = false;
-                        break;
                 }
             }
+
+            ShoppingCart.Clear();
 
             ShopPage();
 
