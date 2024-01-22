@@ -773,24 +773,24 @@ namespace WebbShopBGrpD
                             }
 
 
-                            foreach (var product in productDict)
-                            {
-                                PurchasedArticles purchasedArticles = new();
-                                purchasedArticles.ProductId = product.Key.Id;
-                                purchasedArticles.Quantity = product.Value;
-                                purchasedArticlesList.Add(purchasedArticles);
-                            }
+                            
 
                             Order order = new Order();
                             order.CustomerId = customer.Id;
                             order.DeliveryOption = Array.IndexOf(Enum.GetValues(typeof(MyEnums.DeliveryOption)), deliveryOption);
                             order.PaymentOption = (int)paymentOption;
 
-
-
                             myDb.Orders.Add(order);
                             myDb.SaveChanges();
 
+                            foreach (var product in productDict)
+                            {
+                                PurchasedArticles purchasedArticles = new();
+                                purchasedArticles.ProductId = product.Key.Id;
+                                purchasedArticles.Quantity = product.Value;
+                                purchasedArticles.OrderId = order.Id;
+                                purchasedArticlesList.Add(purchasedArticles);
+                            }
 
                             foreach (var purchasedArticle in purchasedArticlesList)
                             {
@@ -827,9 +827,9 @@ namespace WebbShopBGrpD
                         {
                             connection.Open();
 
-                            var sql = "DELETE FROM Customer WHERE Id = @customerId";
+                            var sql = "DELETE FROM Customer WHERE Id = @CustomerId";
 
-                            customer = connection.QuerySingleOrDefault<Customer>(sql);
+                            customer = connection.QuerySingleOrDefault<Customer>(sql, new{CustomerId = customerId });
                         }
                         process = false;
                         break;
