@@ -253,8 +253,8 @@ namespace WebbShopBGrpD
                         break;
                     case ConsoleKey.R:
                         goTo = "Admin";
-                        break;
                         process = false;
+                        break;
                     case ConsoleKey.T:
                         goTo = "Category1";
                         process = false;
