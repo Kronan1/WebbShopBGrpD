@@ -86,6 +86,7 @@ namespace WebbShopBGrpD
 
             customersData.Add(" [K] för att se kundinformation");
             customersData.Add(" [O] för att ändra kundinformation");
+            customersData.Add(" [H] för att se kundens beställningar");
             customersData.Add(" [X] för att backa");
 
             Console.Clear();
@@ -106,6 +107,10 @@ namespace WebbShopBGrpD
                         Console.Clear();
                         SelectCustomer(customerList, selector);
                         break;
+                    case ConsoleKey.H:
+                        
+
+                        break;
                     case ConsoleKey.A:
                         Console.Clear();
                         selector--;
@@ -114,7 +119,6 @@ namespace WebbShopBGrpD
                             selector = customerList.Count - 1;
                         }
                         SelectCustomer(customerList, selector);
-
                         break;
                     case ConsoleKey.D:
                         Console.Clear();
@@ -129,7 +133,6 @@ namespace WebbShopBGrpD
                         Console.Clear();
                         Customer editedCustomer = EditCustomer(customerList, selector);
                         break;
-
                     case ConsoleKey.X:
                         return;
 
@@ -153,7 +156,8 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Telefonnummer: " + customerList[selector].PhoneNumber.ToString());
             currentCustomer.Add("Mailadress: " + customerList[selector].MailAdress);
             currentCustomer.Add("Lösenord: " + customerList[selector].Password);
-            currentCustomer.Add("Antalet ordrar: " + customerList[selector].Orders.Count().ToString());
+            int orderCount = GetOrders(customerList[selector].Id).Count;
+            currentCustomer.Add("Antalet ordrar: " + orderCount);
             currentCustomer.Add("");
             currentCustomer.Add(" [O] för att ändra uppgifter för denna kund");
             currentCustomer.Add(" [A] för att gå till föregående kund");
@@ -254,6 +258,7 @@ namespace WebbShopBGrpD
                         " [1] Tröjor",
                         " [2] Byxor",
                         " [3] Skor",
+                        " [P] för att lägga till en ny produkt",
                         " [X] för att backa"
                     };
             var customerWindow = new Window("Kunder", 2, 5, messageBox);
@@ -273,6 +278,14 @@ namespace WebbShopBGrpD
                     break;
                 case ConsoleKey.D3:
                     ProductCategory(3);
+                    break;
+                case ConsoleKey.P:
+                    Product newProduct = AddNewProduct();
+                    using (var myDb = new MyDbContext())
+                    {
+                        myDb.Add(newProduct);
+                        myDb.SaveChanges();
+                    }
                     break;
                 case ConsoleKey.X:
                     return;
@@ -388,7 +401,7 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Info: " + productList[selector].Info);
             currentCustomer.Add("Saldo: " + productList[selector].Quantity.ToString());
             currentCustomer.Add("Kategori: " + productList[selector].Category.Name.ToString());
-            //currentCustomer.Add("Supplier: " + productList[selector].Supplier.Name.ToString());
+            currentCustomer.Add("Supplier: " + productList[selector].Supplier.Name.ToString());
             
 
             if (productList[selector].Sale)
@@ -659,6 +672,61 @@ namespace WebbShopBGrpD
             return product;
         }
 
+        //Returnerar en lista med alla kundens artiklar
+        public static List<PurchasedArticles> GetHistory(int customerId)
+        {
+            List<PurchasedArticles> history;
+            List<PurchasedArticles> filteredHistory = new();
+            List<Order> orders;
+            List<Order> filteredOrderList = new();
+            using (var MyDb = new MyDbContext())
+            {
+                history = MyDb.PurchasedArticles.ToList();
+                orders = MyDb.Orders.ToList();
+            }
+            foreach (var order in orders)
+            {
+                if (order.CustomerId == customerId)
+                {
+                    filteredOrderList.Add(order);
+                }
+            }
+
+            foreach (var order in filteredOrderList)
+            {
+                foreach (var post in history)
+                {
+                    if (post.OrderId == order.Id)
+                    {
+                        filteredHistory.Add(post);
+                    }
+                }
+            }
+
+            return filteredHistory;
+        }
+
+        //Returnerar en lista med alla kundens ordrar
+        public static List<Order> GetOrders(int customerId)
+        {
+            List<Order> orders;
+            List<Order> filteredOrders = new();
+            using (var MyDb = new MyDbContext())
+            {
+                orders = MyDb.Orders.ToList();
+            }
+
+            foreach (var order in orders)
+            {
+                if (order.CustomerId == customerId)
+                {
+                    filteredOrders.Add(order);
+                }
+            }
+
+            return filteredOrders;
+        }
+
         public bool InputCheckString(out string input)
         {
             try
@@ -681,8 +749,6 @@ namespace WebbShopBGrpD
                 input = "";
                 return InputCheckString(out input);
             }
-
-
         }
 
         public bool InputCheckInt(out int input)
