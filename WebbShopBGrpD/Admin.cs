@@ -79,10 +79,10 @@ namespace WebbShopBGrpD
 
         public void CustomerAdmin()
         {
-            List<string> message = new();
+           
             List<Customer> customerList = new();
             List<string> customersData = new();
-            List<string> currentCustomer = new();
+           
 
             using (var myDb = new MyDbContext())
             {
@@ -147,7 +147,7 @@ namespace WebbShopBGrpD
                         break;
                     case ConsoleKey.O:
                         Console.Clear();
-                        Customer editedCustomer = EditCustomer(customerList, selector);
+                        Customer editedCustomer = EditCustomer(customerList, selector); //Ändra i databas
                         break;
                     case ConsoleKey.X:
                         return;
@@ -355,7 +355,6 @@ namespace WebbShopBGrpD
             List<Product> productsList = new();
             List<string> productData = new();
             List<string> currentProduct = new();
-            categoryList = new();
             List<ProductSupplier> supplierList = new();
 
 
@@ -597,9 +596,9 @@ namespace WebbShopBGrpD
             Product product = new Product();
 
             List<string> editPageList = new List<string>()
-    {
-        "Vänligen ange kundinformation för produkten du önskar att lägga till."
-    };
+            {
+                "Vänligen ange kundinformation för produkten du önskar att lägga till."
+            };
 
             var addNewCustomerWindow = new Window("Lägg till en ny kund", 2, 5, editPageList);
             addNewCustomerWindow.Left = 25;
@@ -695,19 +694,6 @@ namespace WebbShopBGrpD
                     }
                 }
 
-
-
-                //Väntar på ändring gällande Product.cs
-
-                //Console.WriteLine("Vänligen ange leverantören för produkten.");
-                //if (InputCheckInt(out intInput))
-                //{
-                //    if (intInput < 11)
-                //    {
-                //        product.Supplier = intInput;
-                //    }
-                //}
-
             }
             catch (Exception e)
             {
@@ -717,13 +703,13 @@ namespace WebbShopBGrpD
                 Console.WriteLine("Ett fel har uppstått, vänligen försök igen.");
                 Thread.Sleep(2000);
                 Console.Clear();
-                //return AddNewProduct(productList, selector);
+            
             }
 
             return product;
         }
 
-        //Returnerar en lista med alla kundens artiklar
+        // Returnerar en lista med alla kundens artiklar
         public static List<PurchasedArticles> GetHistory(int customerId)
         {
             List<PurchasedArticles> history;
@@ -757,7 +743,7 @@ namespace WebbShopBGrpD
             return filteredHistory;
         }
 
-        //Returnerar en lista med alla kundens ordrar
+        // Returnerar en lista med alla kundens ordrar
         public static List<Order> GetOrders(int customerId)
         {
             List<Order> orders;
@@ -818,14 +804,6 @@ namespace WebbShopBGrpD
                 }
                 messageList.Add("Produktnamn : " + productName + " x" + history[i].Quantity.ToString());
                 
-                //if ((i+1) == history.Count)
-                //{
-                //    messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber].DeliveryOption]);
-                //    messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber].PaymentOption]);
-                //    orderSum += deliveryPrices[allOrders[orderNumber].PaymentOption];
-                //    messageList.Add("Summa: " + orderSum + " kr");
-                //    messageList.Add("");
-                //}
             }
 
             return messageList;

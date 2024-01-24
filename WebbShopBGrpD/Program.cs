@@ -23,8 +23,8 @@ namespace WebbShopBGrpD
             // Data.CreateData();
             // Console.ReadLine();
 
-
-            Helpers.GetQueries();
+            //Kör denna för Queries:
+            //Helpers.GetQueries();
 
 
 

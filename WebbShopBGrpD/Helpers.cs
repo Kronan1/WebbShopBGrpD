@@ -31,6 +31,8 @@ namespace WebbShopBGrpD
                     Console.WriteLine("Dyraste produkten eller produkterna är: " + product.Name + ": " + product.Price + "kr.");
                 }
                 Console.WriteLine("------------------------------------------------------------------------");
+
+
                 // Hur många som sålts av varje produkt
                 var sql2 = @"SELECT P.Id AS ProductId,
                 P.Name AS ProductName,
@@ -48,11 +50,15 @@ namespace WebbShopBGrpD
                     Console.WriteLine(product.ProductName + " " + ": " + product.TotalQuantitySold);
                 }
                 Console.WriteLine("--------------------------------------------------------------------------");
+
+
                 // Genomsnittlig ålder på kunder
                 var sql3 = "SELECT AVG(Age * 1.0) FROM Customers";
                 var result3 = connection.QueryFirstOrDefault<double>(sql3);
                 Console.WriteLine("Genomsnittliga ålder på kund som handlar hos oss är : " + Math.Round(result3) + " år.");
                 Console.WriteLine("--------------------------------------------------------------------------");
+
+
                 // Tar fram alla produkter som innehåller bomull
                 var sql4 = "SELECT * FROM Products WHERE Info LIKE '%Bomull%' OR Info LIKE '%bomull%'";
                 var result4 = connection.Query<Product>(sql4);

@@ -98,7 +98,7 @@ namespace WebbShopBGrpD
             using (var myDb = new MyDbContext())
             {
                 List<ProductSupplier> currentSuppliers = new List<ProductSupplier>(myDb.ProductSuppliers);
-                List<ProductCategory> currentCategories = new List<ProductCategory>(myDb.ProductCategories);//Har lagt till denna Mira
+                List<ProductCategory> currentCategories = new List<ProductCategory>(myDb.ProductCategories);
                 myDb.AddRange(
                 new Product
                 {
@@ -397,9 +397,7 @@ namespace WebbShopBGrpD
         }
         public static void CreateOrders()
         {
-            //public int PaymentOption { get; set; }
-            //public int DeliveryOption { get; set; }
-            //public int CustomerId { get; set; }
+            
 
             using (var myDb = new MyDbContext())
             {
