@@ -2,18 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using WebbShopBGrpD.Models;
 using WindowDemo;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using static WebbShopBGrpD.MyEnums;
 
 namespace WebbShopBGrpD
 {
     internal class Admin
     {
+        List<Product> allProducts;
+        List<Order> allOrders;
+        List<ProductCategory> categoryList;
         public void AdminPage()
         {
+
+            using (var myDb = new MyDbContext())
+            {
+                allProducts = myDb.Products.ToList();
+                allOrders = myDb.Orders.ToList();
+            }
+
             Menu menu = new Menu();
 
             List<string> adminPageList = new List<string>()
@@ -108,8 +119,13 @@ namespace WebbShopBGrpD
                         SelectCustomer(customerList, selector);
                         break;
                     case ConsoleKey.H:
-                        
-
+                        Console.Clear();
+                        List<PurchasedArticles> customerHistory = GetHistory(selector + 1);
+                        List<string> messageBox = GetOrderList(customerHistory);
+                        var receiptWindow = new Window("Kundens beställningar", 2, 5, messageBox);
+                        receiptWindow.Left = 45;
+                        receiptWindow.Draw();
+                        Console.ReadLine();
                         break;
                     case ConsoleKey.A:
                         Console.Clear();
@@ -141,7 +157,6 @@ namespace WebbShopBGrpD
             }
 
         }
-
 
         public void SelectCustomer(List<Customer> customerList, int selector)
         {
@@ -255,10 +270,9 @@ namespace WebbShopBGrpD
             List<string> messageBox = new List<string>
                     {
                         "Vänligen välj bland en av kategorierna:",
-                        " [1] Tröjor",
-                        " [2] Byxor",
-                        " [3] Skor",
+                        " [C] för att bläddra bland kategorierna",
                         " [P] för att lägga till en ny produkt",
+                        " [K] för att lägga till en ny produktkategori",
                         " [X] för att backa"
                     };
             var customerWindow = new Window("Kunder", 2, 5, messageBox);
@@ -270,20 +284,63 @@ namespace WebbShopBGrpD
 
             switch (input.Key)
             {
-                case ConsoleKey.D1:
-                    ProductCategory(1);
-                    break;
-                case ConsoleKey.D2:
-                    ProductCategory(2);
-                    break;
-                case ConsoleKey.D3:
-                    ProductCategory(3);
+                case ConsoleKey.C:
+                    int cinput = 0;
+                    List<string> categoryMessage = new List<string>();
+                    Console.Clear();
+                    using (MyDbContext myDb = new MyDbContext())
+                    {
+                        int iterator = 1;
+                        foreach (var item in myDb.ProductCategories)
+                        {
+                            categoryMessage.Add($" [{iterator}] " + item.Name);
+                            iterator++;
+                        }
+                    }
+                    var categoryWindow = new Window("Val av kategori", 2, 5, categoryMessage);
+                    categoryWindow.Left = 35;
+                    categoryWindow.Draw();
+
+                    List<string> messageText = new List<string>()
+                    {
+                        "Vänligen ange vilken kategori du önskar att visa genom att ange en siffra."
+                    };
+
+                    var messageWindow = new Window("Val av kategori", 2, 0, messageText);
+                    messageWindow.Left = 35;
+                    messageWindow.Draw();
+                    Console.SetCursorPosition(35, 20);
+                    cinput = CInputCheckInt(out cinput);
+                    ProductCategory(cinput);
                     break;
                 case ConsoleKey.P:
                     Product newProduct = AddNewProduct();
                     using (var myDb = new MyDbContext())
                     {
                         myDb.Add(newProduct);
+                        myDb.SaveChanges();
+                    }
+                    break;
+                case ConsoleKey.K:
+                    Console.Clear();
+                    string sinput = "";
+                    List<string> message = new List<string>()
+                    {
+                        "Vänligen ange namnet för produktkategorin du önskar att lägga till.",
+                    };
+                    var customerEditWindow = new Window("Tillägg av produktkategori", 2, 5, message);
+                    customerEditWindow.Left = 25;
+                    customerEditWindow.Draw();
+
+                    Console.SetCursorPosition(0, 10);
+                    ProductCategory newCategory = new ProductCategory();
+
+                    CInputCheck(out sinput);
+                    newCategory.Name = sinput;
+
+                    using (var myDb = new MyDbContext())
+                    {
+                        myDb.ProductCategories.Add(newCategory);
                         myDb.SaveChanges();
                     }
                     break;
@@ -298,7 +355,7 @@ namespace WebbShopBGrpD
             List<Product> productsList = new();
             List<string> productData = new();
             List<string> currentProduct = new();
-            List<ProductCategory> categoryList = new();
+            categoryList = new();
             List<ProductSupplier> supplierList = new();
 
 
@@ -308,7 +365,7 @@ namespace WebbShopBGrpD
                 productsList = myDb.Products.Where(x => x.Category.Id == category).ToList();
                 categoryList = myDb.ProductCategories.ToList();
                 supplierList = myDb.ProductSuppliers.ToList();
-                
+
             }
 
 
@@ -326,72 +383,68 @@ namespace WebbShopBGrpD
 
             }
 
-            //foreach (Product product in categorizedProducts)
-            //{
-            //    product.Supplier = supplierList[product.Supplier.Id];
-            //}
 
-                foreach (Product targetProduct in categorizedProducts)
-                {
-                    productData.Add("[Produktnummer " + targetProduct.Id.ToString() + "] Produktnamn: " + targetProduct.Name);
-                    productData.Add("");
-                }
+            foreach (Product targetProduct in categorizedProducts)
+            {
+                productData.Add("[Produktnummer " + targetProduct.Id.ToString() + "] Produktnamn: " + targetProduct.Name);
+                productData.Add("");
+            }
 
-                productData.Add(" [K] för att se produktinformation");
-                productData.Add(" [O] för att ändra produktinformation");
-                productData.Add(" [X] för att backa");
+            productData.Add(" [K] för att se produktinformation");
+            productData.Add(" [O] för att ändra produktinformation");
+            productData.Add(" [X] för att backa");
 
 
-                Console.Clear();
-                var customerWindow = new Window(((categoryList[category - 1].Name)).ToString(), 2, 5, productData);
-                customerWindow.Left = 45;
-                customerWindow.Draw();
+            Console.Clear();
+            var customerWindow = new Window(((categoryList[category - 1].Name)).ToString(), 2, 5, productData);
+            customerWindow.Left = 45;
+            customerWindow.Draw();
 
             int selector = 0;
 
-                while (true)
+            while (true)
+            {
+                ConsoleKeyInfo input;
+                input = Console.ReadKey(true);
+                switch (input.Key)
                 {
-                    ConsoleKeyInfo input;
-                    input = Console.ReadKey(true);
-                    switch (input.Key)
-                    {
 
-                        case ConsoleKey.K:
-                            Console.Clear();
-                            SelectProduct(categorizedProducts, selector);
-                            break;
-                        case ConsoleKey.A:
-                            Console.Clear();
-                            selector--;
-                            if (selector < 0)
-                            {
-                                selector = categorizedProducts.Count - 1;
-                            }
-                            SelectProduct(categorizedProducts, selector);
+                    case ConsoleKey.K:
+                        Console.Clear();
+                        SelectProduct(categorizedProducts, selector);
+                        break;
+                    case ConsoleKey.A:
+                        Console.Clear();
+                        selector--;
+                        if (selector < 0)
+                        {
+                            selector = categorizedProducts.Count - 1;
+                        }
+                        SelectProduct(categorizedProducts, selector);
 
-                            break;
-                        case ConsoleKey.D:
-                            Console.Clear();
-                            selector++;
-                            if (selector > categorizedProducts.Count - 1)
-                            {
-                                selector = 0;
-                            }
-                            SelectProduct(categorizedProducts, selector);
-                            break;
-                        case ConsoleKey.O:
-                            Console.Clear();
-                            Product editedProduct = EditProduct(categorizedProducts, selector);
-                            break;
+                        break;
+                    case ConsoleKey.D:
+                        Console.Clear();
+                        selector++;
+                        if (selector > categorizedProducts.Count - 1)
+                        {
+                            selector = 0;
+                        }
+                        SelectProduct(categorizedProducts, selector);
+                        break;
+                    case ConsoleKey.O:
+                        Console.Clear();
+                        Product editedProduct = EditProduct(categorizedProducts, selector);
+                        break;
 
-                        case ConsoleKey.X:
-                            return;
-
-                    }
+                    case ConsoleKey.X:
+                        return;
 
                 }
+
             }
-        
+        }
+
         public void SelectProduct(List<Product> productList, int selector)
         {
             List<string> currentCustomer = new List<string>();
@@ -402,7 +455,7 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Saldo: " + productList[selector].Quantity.ToString());
             currentCustomer.Add("Kategori: " + productList[selector].Category.Name.ToString());
             currentCustomer.Add("Supplier: " + productList[selector].Supplier.Name.ToString());
-            
+
 
             if (productList[selector].Sale)
             {
@@ -422,8 +475,6 @@ namespace WebbShopBGrpD
             }
 
             currentCustomer.Add("Kön: " + Enum.GetName(typeof(MyEnums.Gender), productList[selector].Gender));
-            // currentCustomer.Add("Produktkategori: " + Enum.GetName(typeof(MyEnums.ProductCategory), productList[selector].ProductCategory));
-            //currentCustomer.Add("Leverantör: " + productList[selector].Supplier.Name.ToString()); - Fungerar inte för tillfället
             currentCustomer.Add(" [O] för att ändra uppgifter för denna produkt");
             currentCustomer.Add(" [A] för att gå till föregående produkt");
             currentCustomer.Add(" [D] för att gå till nästa produkt");
@@ -727,6 +778,59 @@ namespace WebbShopBGrpD
             return filteredOrders;
         }
 
+        public List<string> GetOrderList(List<PurchasedArticles> history)
+        {
+            string productName = "";
+            int orderNumber = 0;
+            int orderSum = 0;
+            var deliveryOption = Enum.GetValues(typeof(MyEnums.DeliveryOption)).Cast<MyEnums.DeliveryOption>().ToArray();
+            List<int> deliveryPrices = new();
+            foreach (var item in Enum.GetValues(typeof(MyEnums.DeliveryOption)))
+            {
+                deliveryPrices.Add((int) item);
+            }
+            var paymentOptions = Enum.GetValues(typeof(MyEnums.PaymentOption)).Cast<MyEnums.PaymentOption>().ToArray();
+            List<string> messageList = new List<string>();
+
+            for (int i = 0; i < history.Count; i++)
+            { 
+                if (!(orderNumber == history[i].OrderId))
+                {
+                    if (!(orderSum == 0))
+                    {
+                        messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber].DeliveryOption]);
+                        messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber].PaymentOption]);
+                        orderSum += deliveryPrices[allOrders[orderNumber].PaymentOption];
+                        messageList.Add("Summa: " + orderSum * 1.25 + " kr");
+                        messageList.Add("");
+                    }
+                    orderNumber = history[i].OrderId;
+                    orderSum = 0;
+                    messageList.Add("Ordernummer: " + orderNumber);
+                }
+                foreach (var item in allProducts)
+                {
+                    if (history[i].ProductId == item.Id)
+                    {
+                        productName = item.Name;
+                        orderSum += (int)(item.Price * history[i].Quantity);
+                    }
+                }
+                messageList.Add("Produktnamn : " + productName + " x" + history[i].Quantity.ToString());
+                
+                //if ((i+1) == history.Count)
+                //{
+                //    messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber].DeliveryOption]);
+                //    messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber].PaymentOption]);
+                //    orderSum += deliveryPrices[allOrders[orderNumber].PaymentOption];
+                //    messageList.Add("Summa: " + orderSum + " kr");
+                //    messageList.Add("");
+                //}
+            }
+
+            return messageList;
+        }
+
         public bool InputCheckString(out string input)
         {
             try
@@ -740,7 +844,6 @@ namespace WebbShopBGrpD
                 {
                     return true;
                 }
-
             }
             catch
             {
