@@ -10,5 +10,7 @@ namespace WebbShopBGrpD.Queries
     {
         public int ProductId { get; set; }
         public int TotalQuantitySold { get; set; }
+        public string ProductName { get; set; }
+
     }
 }

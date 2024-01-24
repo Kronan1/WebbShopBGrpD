@@ -147,15 +147,15 @@ namespace WebbShopBGrpD
                             break;
 
                         case ConsoleKey.A:
-                            goTo = "Category1";
+                            goTo = "Product1";
                             process = false;
                             break;
                         case ConsoleKey.S:
-                            goTo = "Category2";
+                            goTo = "Product2";
                             process = false;
                             break;
                         case ConsoleKey.D:
-                            goTo = "Category3";
+                            goTo = "Product3";
                             process = false;
                             break;
                         case ConsoleKey.Z:
@@ -184,15 +184,15 @@ namespace WebbShopBGrpD
                         Admin admin = new Admin();
                         admin.AdminPage();
                         break;
-                    case "Category1":
+                    case "Product1":
                         ShoppingCart.Add(featuredProducts[0]);
                         StartPage();
                         break;
-                    case "Category2":
+                    case "Product2":
                         ShoppingCart.Add(featuredProducts[1]);
                         StartPage();
                         break;
-                    case "Category3":
+                    case "Product3":
                         ShoppingCart.Add(featuredProducts[2]);
                         StartPage();
                         break;
@@ -474,29 +474,51 @@ namespace WebbShopBGrpD
             categoriesWindow.Draw();
 
             ConsoleKeyInfo input = Console.ReadKey(true);
+           
 
-            switch (input.Key)
+            if (input.Key == ConsoleKey.X)
             {
-                case ConsoleKey.D1:
-                    ShowProductInfo(products[0]);
-                    break;
-                case ConsoleKey.D2:
-                    ShowProductInfo(products[1]);
-                    break;
-                case ConsoleKey.D3:
-                    ShowProductInfo(products[2]);
-                    break;
-                case ConsoleKey.D4:
-                    ShowProductInfo(products[3]);
-                    break;
-                case ConsoleKey.D5:
-                    ShowProductInfo(products[4]);
-                    break;
-                case ConsoleKey.X:
+                Console.Clear();
+                ShopPage();
+            }
+            else if (input.Key >= ConsoleKey.D1 && input.Key <= ConsoleKey.D9)
+            {
+                int selectedIndex = (int)input.Key - (int)ConsoleKey.D1;
+
+                if (selectedIndex < products.Count)
+                {
+                    ShowProductInfo(products[selectedIndex]);
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltigt val. Försök igen.");
+                    Thread.Sleep(1000);
                     Console.Clear();
                     ShopPage();
-                    break;
+                }
             }
+            //switch (input.Key)
+            //{
+            //    case ConsoleKey.D1:
+            //        ShowProductInfo(products[0]);
+            //        break;
+            //    case ConsoleKey.D2:
+            //        ShowProductInfo(products[1]);
+            //        break;
+            //    case ConsoleKey.D3:
+            //        ShowProductInfo(products[2]);
+            //        break;
+            //    case ConsoleKey.D4:
+            //        ShowProductInfo(products[3]);
+            //        break;
+            //    case ConsoleKey.D5:
+            //        ShowProductInfo(products[4]);
+            //        break;
+            //    case ConsoleKey.X:
+            //        Console.Clear();
+            //        ShopPage();
+            //        break;
+            //}
         }
 
         public void ShowProductInfo(Product product)
