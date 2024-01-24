@@ -34,45 +34,11 @@ namespace WebbShopBGrpD
             windowTitle.Left = 45;
             windowTitle.Draw();
 
-            //List<string> navigationText = new List<string> { "[1] = Start", "[2] = Shop", "[3] = Varukorg", "[4] = Admin" };
             List<string> navigationText = new List<string> { "[Q] = Start [W] = Shop [E] = Varukorg [R] = Admin" };
             var windowNavigation = new Window("", 2, 5, navigationText);
             windowNavigation.Left = 28;
             windowNavigation.Draw();
 
-
-            #region QuantityCheck
-            //int productsInCart = 3;
-            //switch (ShoppingCart.Count())
-            //{
-            //    case 1:
-            //        productsInCart = 1;
-            //        break;
-            //    case 2:
-            //        productsInCart = 2;
-            //        break;
-            //    case > 2:
-            //        productsInCart = 3;
-            //        break;
-
-            //    default:
-            //        productsInCart = 0;
-            //        break;
-            //}
-
-            //int quantity = 0;
-            //for (int i = 0; i < productsInCart; i++)
-            //{
-            //    foreach (var product in ShoppingCart)
-            //    {
-            //        if (product.Id == ShoppingCart[i].Id)
-            //        {
-            //            quantity++;
-            //        }
-            //    }
-
-            //}
-            #endregion
 
             List<string> shoppingCartText = new List<string> { };
 
@@ -217,7 +183,7 @@ namespace WebbShopBGrpD
             Char[] chars = { 'T', 'B', 'S' };
             MenuBar();
             int iterator = 0;
-            foreach (var category in Enum.GetValues(typeof(MyEnums.ProductCategory)))
+            foreach (var category in Enum.GetValues(typeof(MyEnums.ProductCategories)))
             {
                 categoriesList.Add($" [{chars[iterator]}] = " + category.ToString());
                 iterator++;
@@ -310,7 +276,7 @@ namespace WebbShopBGrpD
 
         public void ShoppingCartPage()
         {
-            // Skriv om
+           
             bool process = true;
 
             while (process)
@@ -455,7 +421,7 @@ namespace WebbShopBGrpD
             using (var myDb = new MyDbContext())
             {
                 products = myDb.Products.Where(x => x.Category.Id == category).ToList();
-                //products = myDb.ProductCategories.Where(x => x.pr == category).ToList();
+                
             }
 
             List<string> productNameList = new List<string>();
@@ -497,28 +463,7 @@ namespace WebbShopBGrpD
                     ShopPage();
                 }
             }
-            //switch (input.Key)
-            //{
-            //    case ConsoleKey.D1:
-            //        ShowProductInfo(products[0]);
-            //        break;
-            //    case ConsoleKey.D2:
-            //        ShowProductInfo(products[1]);
-            //        break;
-            //    case ConsoleKey.D3:
-            //        ShowProductInfo(products[2]);
-            //        break;
-            //    case ConsoleKey.D4:
-            //        ShowProductInfo(products[3]);
-            //        break;
-            //    case ConsoleKey.D5:
-            //        ShowProductInfo(products[4]);
-            //        break;
-            //    case ConsoleKey.X:
-            //        Console.Clear();
-            //        ShopPage();
-            //        break;
-            //}
+           
         }
 
         public void ShowProductInfo(Product product)
@@ -700,7 +645,7 @@ namespace WebbShopBGrpD
                     Thread.Sleep(1000);
                     Console.Clear();
                 }
-            } while (phoneNumber < 1);
+            } while (age < 1);
             Console.Clear();
 
             Console.Write("Lösenord: ");
@@ -1062,6 +1007,6 @@ namespace WebbShopBGrpD
             }
         }
 
-        // public void UpdateShoppingCart
+       
     }
 }

@@ -1,59 +1,71 @@
-﻿using System;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebbShopBGrpD.Models;
+using WebbShopBGrpD.Queries;
 
 namespace WebbShopBGrpD
 {
     internal class Helpers
     {
 
-        public List<Product> ShoppingCart { get; set; }
-        public Helpers()
+        public static void GetQueries()
         {
+            string connectionstring = "server=.\\sqlexpress;database=webbshopb;trusted_connection=true;trustservercertificate=true;";
 
+
+
+            using (var connection = new SqlConnection(connectionstring))
+            {
+                connection.Open();
+
+                // Dyraste produkten/produkterna
+                var sql1 = "SELECT * FROM Products WHERE Price = (SELECT TOP 1 Price FROM Products ORDER BY Price DESC)";
+                var result1 = connection.Query<Product>(sql1);
+                foreach (var product in result1)
+                {
+                    Console.WriteLine("Dyraste produkten eller produkterna är: " + product.Name + ": " + product.Price + "kr.");
+                }
+                Console.WriteLine("------------------------------------------------------------------------");
+                // Hur många som sålts av varje produkt
+                var sql2 = @"SELECT P.Id AS ProductId,
+                P.Name AS ProductName,
+                COALESCE(SUM(PA.Quantity), 0) AS TotalQuantitySold
+                FROM Products P
+                LEFT JOIN
+                PurchasedArticles PA ON P.Id = PA.ProductId
+                GROUP BY
+                P.Id, P.Name
+                ORDER BY TotalQuantitySold DESC";
+                var result2 = connection.Query<ProductsSold>(sql2);
+                Console.WriteLine("Försäljningssiffror av alla sålda produkter: ");
+                foreach (var product in result2)
+                {
+                    Console.WriteLine(product.ProductName + " " + ": " + product.TotalQuantitySold);
+                }
+                Console.WriteLine("--------------------------------------------------------------------------");
+                // Genomsnittlig ålder på kunder
+                var sql3 = "SELECT AVG(Age * 1.0) FROM Customers";
+                var result3 = connection.QueryFirstOrDefault<double>(sql3);
+                Console.WriteLine("Genomsnittliga ålder på kund som handlar hos oss är : " + Math.Round(result3) + " år.");
+                Console.WriteLine("--------------------------------------------------------------------------");
+                // Tar fram alla produkter som innehåller bomull
+                var sql4 = "SELECT * FROM Products WHERE Info LIKE '%Bomull%' OR Info LIKE '%bomull%'";
+                var result4 = connection.Query<Product>(sql4);
+                Console.WriteLine("Alla produkter som innehåller bomull: ");
+                foreach (var product in result4)
+                {
+                    Console.WriteLine(product.Name + ": " + product.Info);
+                }
+               
+            }
         }
 
-        public static Dictionary<string, float> CreateDeliveryPrice()
-        {
-            Dictionary<string, float> DeliveryPrice = new Dictionary<string, float>();
-            DeliveryPrice.Add(MyEnums.DeliveryOption.Postnord.ToString(), 50);
-            DeliveryPrice.Add(MyEnums.DeliveryOption.Dhl.ToString(), 75);
-            DeliveryPrice.Add(MyEnums.DeliveryOption.Schenker.ToString(), 60);
-            DeliveryPrice.Add(MyEnums.DeliveryOption.Bring.ToString(), 49);
-            DeliveryPrice.Add(MyEnums.DeliveryOption.EarlyBird.ToString(), 64);
-
-            return DeliveryPrice;
-        }
-
-
-        //// Hämtar från databasen
-        //List<string> categoriesText = new List<string> { "Byxor", "Tröjor", "Skor", "Skjortor", "xxxxxxxxxxxxxxxxxxxxxxx" };
-        ////foreach(var text in categoriesText)
-        ////{
-        ////    Console.WriteLine(text);
-        ////}
-
-        //// Detta hämtas från databas
-        //List<string> cartText = new List<string> { "1 st Blå byxor", "1 st Grön tröja", "1 st Röd skjorta" };
-        //var windowCart = new Window("Din varukorg", 30, 6, cartText);
-        //windowCart.Draw();
-
-        //var windowCategories = new Window("Kategorier", 2, 6, categoriesText);
-        //windowCategories.Draw();
-
-        //List<string> topText = new List<string> { "# Fina butiken #", "Allt inom kläder" };
-        //var windowTop = new Window("", 2, 1, topText);
-        //windowTop.Draw();
-
-        //windowTop.Left = 45;
-        //windowTop.Draw();
-
-        //Console.WriteLine("Nån annan text");
-
-        //Console.ReadLine();
+     
 
 
 
