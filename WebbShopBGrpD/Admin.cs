@@ -180,8 +180,8 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Antalet ordrar: " + orderCount);
             currentCustomer.Add("");
             currentCustomer.Add(" [O] för att ändra uppgifter för denna kund");
-            currentCustomer.Add(" [H] för att se historik för denna kund");
-            currentCustomer.Add(" [A] för att se kundens beställningar");
+            currentCustomer.Add(" [H] för att se kundens beställningar");
+            currentCustomer.Add(" [A] för att gå till föregående kund");
             currentCustomer.Add(" [D] för att gå till nästa kund");
             currentCustomer.Add(" [X] för att backa");
 
