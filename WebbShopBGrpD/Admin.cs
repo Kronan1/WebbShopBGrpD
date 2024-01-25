@@ -16,14 +16,10 @@ namespace WebbShopBGrpD
         List<Product> allProducts;
         List<Order> allOrders;
         List<ProductCategory> categoryList;
-        public void AdminPage()
+        public async void AdminPage()
         {
 
-            using (var myDb = new MyDbContext())
-            {
-                allProducts = myDb.Products.ToList();
-                allOrders = myDb.Orders.ToList();
-            }
+            await FetchData();
 
             Menu menu = new Menu();
 
@@ -147,7 +143,16 @@ namespace WebbShopBGrpD
                         break;
                     case ConsoleKey.O:
                         Console.Clear();
-                        Customer editedCustomer = EditCustomer(customerList, selector); //Ändra i databas
+                        Customer editedCustomer = EditCustomer(customerList, selector); 
+                        using (var myDb = new MyDbContext())
+                        {
+                            var customerToEdit = myDb.Customers.SingleOrDefault(x => x.Id == editedCustomer.Id);
+                            if (customerToEdit != null)
+                            {
+                                customerToEdit = editedCustomer;
+                                myDb.SaveChanges();
+                            }
+                        }
                         break;
                     case ConsoleKey.X:
                         return;
@@ -285,7 +290,7 @@ namespace WebbShopBGrpD
             switch (input.Key)
             {
                 case ConsoleKey.C:
-                    int cinput = 0;
+                    int cInput = 0;
                     List<string> categoryMessage = new List<string>();
                     Console.Clear();
                     using (MyDbContext myDb = new MyDbContext())
@@ -310,8 +315,8 @@ namespace WebbShopBGrpD
                     messageWindow.Left = 35;
                     messageWindow.Draw();
                     Console.SetCursorPosition(35, 20);
-                    cinput = CInputCheckInt(out cinput);
-                    ProductCategory(cinput);
+                    cInput = CInputCheckInt(out cInput);
+                    ProductCategory(cInput);
                     break;
                 case ConsoleKey.P:
                     Product newProduct = AddNewProduct();
@@ -323,7 +328,7 @@ namespace WebbShopBGrpD
                     break;
                 case ConsoleKey.K:
                     Console.Clear();
-                    string sinput = "";
+                    string sInput = "";
                     List<string> message = new List<string>()
                     {
                         "Vänligen ange namnet för produktkategorin du önskar att lägga till.",
@@ -335,8 +340,8 @@ namespace WebbShopBGrpD
                     Console.SetCursorPosition(0, 10);
                     ProductCategory newCategory = new ProductCategory();
 
-                    CInputCheck(out sinput);
-                    newCategory.Name = sinput;
+                    CInputCheck(out sInput);
+                    newCategory.Name = sInput;
 
                     using (var myDb = new MyDbContext())
                     {
@@ -349,7 +354,7 @@ namespace WebbShopBGrpD
             }
         }
 
-        public void ProductCategory(int category)
+        public async void ProductCategory(int category)
         {
             List<string> message = new();
             List<Product> productsList = new();
@@ -359,6 +364,8 @@ namespace WebbShopBGrpD
 
 
 
+           
+
             using (var myDb = new MyDbContext())
             {
                 productsList = myDb.Products.Where(x => x.Category.Id == category).ToList();
@@ -367,6 +374,20 @@ namespace WebbShopBGrpD
 
             }
 
+            if (productsList.Count == 0)
+            {
+                Console.Clear();
+                List<string> info = new List<string>()
+                {
+                    "Denna kategori har för nuvarande inga produkter.",
+                    "Vänligen lägg till fler produkter i denna kategori."
+                };
+                var messageWindow = new Window("Info", 2, 5, info);
+                messageWindow.Left = 35;
+                messageWindow.Draw();
+                Thread.Sleep(2000);
+                return;
+            }
 
             List<Product> categorizedProducts = new();
 
@@ -892,6 +913,16 @@ namespace WebbShopBGrpD
                 Console.WriteLine(e.Message);
                 Console.WriteLine("Fel har uppstått, vänligen försök igen.");
                 return CInputCheckInt(out input);
+            }
+        }
+
+        public async Task FetchData()
+        {
+            using (var myDb = new MyDbContext())
+            {
+                allProducts = myDb.Products.ToList();
+                allOrders = myDb.Orders.ToList();
+                categoryList = myDb.ProductCategories.ToList();
             }
         }
 
