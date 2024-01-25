@@ -116,12 +116,12 @@ namespace WebbShopBGrpD
                         break;
                     case ConsoleKey.H:
                         Console.Clear();
+                        Console.SetCursorPosition(0, 0);
                         List<PurchasedArticles> customerHistory = GetHistory(selector + 1);
                         List<string> messageBox = GetOrderList(customerHistory);
                         var receiptWindow = new Window("Kundens beställningar", 2, 5, messageBox);
                         receiptWindow.Left = 45;
                         receiptWindow.Draw();
-                        Console.ReadLine();
                         break;
                     case ConsoleKey.A:
                         Console.Clear();
@@ -180,7 +180,8 @@ namespace WebbShopBGrpD
             currentCustomer.Add("Antalet ordrar: " + orderCount);
             currentCustomer.Add("");
             currentCustomer.Add(" [O] för att ändra uppgifter för denna kund");
-            currentCustomer.Add(" [A] för att gå till föregående kund");
+            currentCustomer.Add(" [H] för att se historik för denna kund");
+            currentCustomer.Add(" [A] för att se kundens beställningar");
             currentCustomer.Add(" [D] för att gå till nästa kund");
             currentCustomer.Add(" [X] för att backa");
 
@@ -805,9 +806,9 @@ namespace WebbShopBGrpD
                 {
                     if (!(orderSum == 0))
                     {
-                        messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber].DeliveryOption]);
-                        messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber].PaymentOption]);
-                        orderSum += deliveryPrices[allOrders[orderNumber].PaymentOption];
+                        messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber-1].DeliveryOption]);
+                        messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber-1].PaymentOption]);
+                        orderSum += deliveryPrices[allOrders[orderNumber-1].PaymentOption];
                         messageList.Add("Summa: " + orderSum * 1.25 + " kr");
                         messageList.Add("");
                     }
@@ -824,7 +825,20 @@ namespace WebbShopBGrpD
                     }
                 }
                 messageList.Add("Produktnamn : " + productName + " x" + history[i].Quantity.ToString());
-                
+
+
+                if (i == history.Count-1)
+                {
+                    messageList.Add("Leveransalterantiv: " + deliveryOption[allOrders[orderNumber - 1].DeliveryOption]);
+                    messageList.Add("Betalningssätt: " + paymentOptions[allOrders[orderNumber - 1].PaymentOption]);
+                    orderSum += deliveryPrices[allOrders[orderNumber - 1].PaymentOption];
+                    messageList.Add("Summa: " + orderSum * 1.25 + " kr");
+                    messageList.Add("");
+                    messageList.Add(" [O] för att ändra uppgifter för denna kund");
+                    messageList.Add(" [A] för att gå till föregående kund");
+                    messageList.Add(" [D] för att gå till nästa kund");
+                    messageList.Add(" [X] för att backa");
+                }
             }
 
             return messageList;
