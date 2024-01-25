@@ -8,7 +8,6 @@ namespace WebbShopBGrpD.Models
 {
     internal class Order
     {
-
         public int Id { get; set; }
         public int PaymentOption { get; set; }
         public int DeliveryOption { get; set; }

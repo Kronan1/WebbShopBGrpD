@@ -17,8 +17,6 @@ namespace WebbShopBGrpD
         {
             string connectionstring = "server=.\\sqlexpress;database=webbshopb;trusted_connection=true;trustservercertificate=true;";
 
-
-
             using (var connection = new SqlConnection(connectionstring))
             {
                 connection.Open();

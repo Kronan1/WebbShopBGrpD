@@ -26,12 +26,10 @@ namespace WebbShopBGrpD
             //Kör denna för Queries:
             //Helpers.GetQueries();
 
-
-
             Menu menu = new Menu();
 
             menu.StartPage();
-           
+
         }
     }
 }

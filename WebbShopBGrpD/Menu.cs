@@ -29,7 +29,7 @@ namespace WebbShopBGrpD
         }
         public void MenuBar()
         {
-            List<string> titleText = new List<string> { "# Fina butiken #", "Allt inom kläder" };
+            List<string> titleText = new List<string> { "    # Sharp #", "Allt inom kläder" };
             var windowTitle = new Window("", 2, 1, titleText);
             windowTitle.Left = 45;
             windowTitle.Draw();
@@ -48,14 +48,10 @@ namespace WebbShopBGrpD
             var windowShoppingCart = new Window("", 2, 5, shoppingCartText);
             windowShoppingCart.Left = 85;
             windowShoppingCart.Draw();
-
-
-
         }
 
         public void StartPage()
         {
-
             MenuBar();
 
             List<Product> featuredProducts = new List<Product>();
@@ -64,8 +60,6 @@ namespace WebbShopBGrpD
             {
                 featuredProducts = myDb.Products.Where(x => x.FeaturedProduct == true).ToList();
             }
-
-
 
             try
             {
@@ -127,10 +121,7 @@ namespace WebbShopBGrpD
                         case ConsoleKey.Z:
                             goTo = "ShowSearchProducts";
                             break;
-
-
                     }
-
                 }
 
                 Console.Clear();
@@ -164,15 +155,11 @@ namespace WebbShopBGrpD
                         break;
                     case "ShowSearchedProducts":
                         ShowSearchProduts();
-                        break;
-                        
+                        break;       
                 }
-
-
             }
             catch (Exception e)
             {
-
                 throw;
             }
         }
@@ -195,13 +182,10 @@ namespace WebbShopBGrpD
             categoriesWindow.Draw();
 
             bool process = true;
-
             string goTo = "Error";
             while (process)
             {
-
                 ConsoleKeyInfo input = Console.ReadKey(true);
-
 
                 switch (input.Key)
                 {
@@ -269,14 +253,11 @@ namespace WebbShopBGrpD
                 case "Search":
                     ShowSearchProduts();
                     break;
-
             }
-
         }
 
         public void ShoppingCartPage()
-        {
-           
+        {           
             bool process = true;
 
             while (process)
@@ -312,8 +293,6 @@ namespace WebbShopBGrpD
                     var instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
                     instructionsWindow.Left = 45;
                     instructionsWindow.Draw();
-
-
 
                     if (int.TryParse(Console.ReadLine(), out int input2))
                     {
@@ -358,14 +337,28 @@ namespace WebbShopBGrpD
                                 currentProductWindow.Draw();
                                 input = Console.ReadKey(true);
 
-
                                 switch (input.Key)
                                 {
                                     case ConsoleKey.A:
                                         if (ShoppingCart.Contains(currentProduct))
                                         {
                                             var indexToRemove = ShoppingCart.FindLastIndex(x => x.Id == currentProduct.Id);
+                                            var idToRemove = ShoppingCart.Last(x => x.Id == currentProduct.Id);
                                             ShoppingCart.RemoveAt(indexToRemove);
+                                            bool productExist = false;
+
+                                            foreach (var product in ShoppingCart)
+                                            {
+                                                if (product.Id == idToRemove.Id)
+                                                {
+                                                    productExist = true;
+                                                }
+                                            }
+
+                                            if (!productExist)
+                                            {
+                                                processProduct = false;
+                                            }
                                         }
                                         break;
                                     case ConsoleKey.D:
@@ -379,12 +372,10 @@ namespace WebbShopBGrpD
                                         break;
                                 }
                             }
-
                         }
                         else
                         {
                             instructionsText.Add(" Finns ingen artikel med det numret");
-
                             instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
                             instructionsWindow.Left = 45;
                             instructionsWindow.Draw();
@@ -394,7 +385,6 @@ namespace WebbShopBGrpD
                     else
                     {
                         instructionsText.Add(" Felaktig inmatning");
-
                         instructionsWindow = new Window("Instruktioner", 15, 5, instructionsText);
                         instructionsWindow.Left = 45;
                         instructionsWindow.Draw();
@@ -426,7 +416,6 @@ namespace WebbShopBGrpD
 
             List<string> productNameList = new List<string>();
 
-
             int iterator = 1;
             foreach (var product in products)
             {
@@ -441,7 +430,6 @@ namespace WebbShopBGrpD
 
             ConsoleKeyInfo input = Console.ReadKey(true);
            
-
             if (input.Key == ConsoleKey.X)
             {
                 Console.Clear();
@@ -462,8 +450,7 @@ namespace WebbShopBGrpD
                     Console.Clear();
                     ShopPage();
                 }
-            }
-           
+            }           
         }
 
         public void ShowProductInfo(Product product)
@@ -482,7 +469,6 @@ namespace WebbShopBGrpD
             var productInfoWindow = new Window("Produktinformation", 15, 10, productInfo);
             productInfoWindow.Left = 35;
             productInfoWindow.Draw();
-
 
             List<string> shoppingCartText = new List<string> { };
 
@@ -549,7 +535,6 @@ namespace WebbShopBGrpD
             }
 
             return customer;
-
         }
 
         public Customer ExistingCustomer()
@@ -563,9 +548,7 @@ namespace WebbShopBGrpD
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-
                 var sql = "SELECT * FROM Customers WHERE MailAdress = @Email";
-
                 customer = connection.QuerySingleOrDefault<Customer>(sql, new { Email = email });
             }
 
@@ -668,18 +651,14 @@ namespace WebbShopBGrpD
                 using (var myDb = new MyDbContext())
                 {
                     myDb.Customers.Add(customer);
-
                     myDb.SaveChanges();
-
                     customer = myDb.Customers.OrderByDescending(c => c.Id).FirstOrDefault();
                 }
             }
             catch (Exception e)
             {
-
                 throw;
             }
-
 
             return customer;
         }
@@ -700,7 +679,6 @@ namespace WebbShopBGrpD
             customerInfo.Add(" ");
             customerInfo.Add(" [K] Slutför köp");
 
-
             var customerWindow = new Window("Kund", 15, 5, customerInfo);
             customerWindow.Left = 45;
             customerWindow.Draw();
@@ -718,8 +696,6 @@ namespace WebbShopBGrpD
                             List<PurchasedArticles> purchasedArticlesList = new();
                             Dictionary<Product, int> productDict = CalculateShoppingCart();
 
-
-
                             foreach (var product in myDb.Products)
                             {
                                 foreach (var product2 in productDict)
@@ -730,10 +706,7 @@ namespace WebbShopBGrpD
                                     }
                                 }
                             }
-
-
-                            
-
+                          
                             Order order = new Order();
                             order.CustomerId = customer.Id;
                             order.DeliveryOption = Array.IndexOf(Enum.GetValues(typeof(MyEnums.DeliveryOption)), deliveryOption);
@@ -762,12 +735,10 @@ namespace WebbShopBGrpD
                         }
                         Console.Clear();
                         break;
-
                 }
             }
 
             ShoppingCart.Clear();
-
             ShopPage();
 
         }
@@ -834,11 +805,9 @@ namespace WebbShopBGrpD
                 iterator++;
             }
 
-
             var deliveryWindow = new Window("Betalnings alternativ", 15, 10, paymentInfo);
             deliveryWindow.Left = 45;
             deliveryWindow.Draw();
-
 
             bool process = true;
             MyEnums.PaymentOption selectedPayment = MyEnums.PaymentOption.Klarna;
@@ -866,7 +835,6 @@ namespace WebbShopBGrpD
                         break;
                 }
             }
-
 
             Console.Clear();
 
@@ -972,9 +940,7 @@ namespace WebbShopBGrpD
                                 goTo = "ShowSearchProducts";
                                 break;
                             }
-
                         }
-
                     }
                 }
                 catch (Exception e)
@@ -990,7 +956,6 @@ namespace WebbShopBGrpD
                     goTo = "ShopPage";
                     break;
                 }
-
             }
 
             switch (goTo)
@@ -1006,7 +971,5 @@ namespace WebbShopBGrpD
                     break;
             }
         }
-
-       
     }
 }
